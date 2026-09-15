@@ -28,4 +28,6 @@ uploads
 /public/bundles/fosckeditor/
 /MAQUETTAGE
 todo.txt
-/.env.test
+/.env.test.idea/
+
+.idea/
