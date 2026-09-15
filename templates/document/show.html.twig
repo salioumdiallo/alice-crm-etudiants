@@ -81,7 +81,7 @@
                                 <a href="{{ path('app_document_edit', {'id': document.id}) }}" class="btn-fa-action-list mx-1"><i class="fa-solid fa-pen-to-square fa-xl"></i></a>
                             {% endif %}
 
-                            <a href="{{ asset('uploads/documents/' ~ document.fileName) }}" download class="btn-fa-action-list mx-1">
+                            <a href="{{ path('app_document_file', {'id': document.id}) }}" download class="btn-fa-action-list mx-1">
                             <i class="fa-solid fa-download fa-xl"></i></a>
 
                             {% if isAuthorized %}
@@ -97,9 +97,9 @@
 
     <div class="embed-container ms-lg-5">
         {% if document.fileName|lower ends with('.pdf') %}
-            <embed src="{{ asset('uploads/documents/' ~ document.fileName) }}" type='application/pdf' alt="{{ document.name }}" width="300" height="1000">
+            <embed src="{{ path('app_document_file', {'id': document.id}) }}" type='application/pdf' alt="{{ document.name }}" width="300" height="1000">
         {% else %}
-            <img src="{{ asset('uploads/documents/' ~ document.fileName) }}" alt="{{ document.name }}" class="img-embed-document">
+            <img src="{{ path('app_document_file', {'id': document.id}) }}" alt="{{ document.name }}" class="img-embed-document">
         {% endif %}
     </div>
 

@@ -75,7 +75,7 @@
                     <div class="d-flex ">
                         <a href="{{ path('app_document_show', {'id': document.id}) }}" class="btn-fa-action-eye m-0 mx-2"><i class="fa-solid fa-eye fa-xl"></i></a>
 
-                        <a href="{{ asset('uploads/documents/' ~ document.fileName) }}" class="button-download m-0 mx-2" target="_blank" rel="noopener noreferrer" download>
+                        <a href="{{ path('app_document_file', {'id': document.id}) }}" class="button-download m-0 mx-2" target="_blank" rel="noopener noreferrer" download>
                             <i class="fa-solid fa-download fa-xl"></i>
                         </a>
 

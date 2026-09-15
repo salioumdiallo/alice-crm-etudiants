@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Entity\Document;
 use App\Form\DocumentType;
 use App\Repository\DocumentRepository;
+use App\Security\DocumentVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,6 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 
@@ -106,9 +108,15 @@ class DocumentController extends AbstractController
                 $currentDate = date('Ymd'); // add date
                 $newFilename = $currentDate.'-'.$safeFilename.'-'.uniqid().'.'.$file->guessExtension(); // gess extention and add to the URL
                 try {
+                    $documentsDirectory = $this->getParameter('documents_directory');
+
+                    if (!is_dir($documentsDirectory) && !mkdir($documentsDirectory, 0775, true) && !is_dir($documentsDirectory)) {
+                        throw new FileException('Impossible de créer le répertoire de stockage des documents.');
+                    }
+
                     // Move the file to the directory where brochures are stored
                     $file->move(
-                        $this->getParameter('documents_directory'),
+                        $documentsDirectory,
                         $newFilename
                     );
                 } catch (FileException $e) {
@@ -134,15 +142,10 @@ class DocumentController extends AbstractController
     #[Route('/{id}', name: 'app_document_show', methods: ['GET'])]
     public function show(Document $document, AuthorizationCheckerInterface $authChecker): Response
     {
-        // Create a status isAuthorized status to filter users who are authorized to view the document
-        
+        $this->denyAccessUnlessGranted(DocumentVoter::VIEW, $document);
+
         $isAuthorized = $authChecker->isGranted('ROLE_ADMIN');
         $authorizedUsers = $document->getUser()->toArray();
-        $user = $this->getUser();
-    
-        if (!$isAuthorized && !in_array($user, $authorizedUsers)) {
-            throw $this->createAccessDeniedException();
-        }
     
         return $this->render('document/show.html.twig', [
             'document' => $document,
@@ -151,11 +154,30 @@ class DocumentController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/fichier', name: 'app_document_file', methods: ['GET'])]
+    public function downloadDocument(Document $document): Response
+    {
+        $this->denyAccessUnlessGranted(DocumentVoter::VIEW, $document);
+
+        $fileName = basename($document->getFileName());
+        $filePath = $this->getParameter('documents_directory').DIRECTORY_SEPARATOR.$fileName;
+
+        if (!is_file($filePath)) {
+            throw $this->createNotFoundException('Le fichier demandé est introuvable.');
+        }
+
+        return $this->file(
+            $filePath,
+            $fileName,
+            ResponseHeaderBag::DISPOSITION_INLINE
+        );
+    }
+
     #[Route('/{id}/modifier', name: 'app_document_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Document $document, AuthorizationCheckerInterface $authChecker): Response
     {
         // only ADMIN is authorized to edit document
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted(DocumentVoter::EDIT, $document);
 
         $isAuthorized = $authChecker->isGranted('ROLE_ADMIN');
 
@@ -186,7 +208,7 @@ class DocumentController extends AbstractController
     #[Route('/{id}', name: 'app_document_delete', methods: ['POST'])]
     public function delete(Request $request, Document $document): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted(DocumentVoter::DELETE, $document);
 
         if ($this->isCsrfTokenValid('delete'.$document->getId(), $request->request->get('_token'))) {
             $this->documentRepository->remove($document, true);

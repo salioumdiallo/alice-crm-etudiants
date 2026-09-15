@@ -27,7 +27,7 @@ Masquer le bouton dans Twig ne constitue pas un contrôle d'accès.
 Les fichiers restent servis depuis `public/uploads/documents`. Le prochain lot doit
 les déplacer dans un stockage privé et ajouter une route de téléchargement avec un
 contrôle d'accès centralisé (voter). La migration des fichiers existants devra être
-prévue avant le déploiement.
+prévue avant le déploiement. Ce risque est traité par le lot 4 ci-dessous.
 
 ## 2026-09-15 — Lot 3 : suppressions via POST
 
@@ -45,3 +45,26 @@ prévue avant le déploiement.
 - exécution non possible dans cet environnement faute de PHP, Composer, Docker et
   SonarScanner ; la première exécution doit donc être faite après configuration des
   secrets GitHub `SONAR_TOKEN` et `SONAR_HOST_URL`.
+
+## 2026-09-15 — Lot 4 : stockage privé des documents
+
+- déplacement du répertoire cible de `public/uploads/documents` vers `var/documents` ;
+- ajout de `DocumentVoter` pour centraliser les droits VIEW, EDIT et DELETE ;
+- ajout de la route authentifiée `app_document_file` qui vérifie l'autorisation avant
+  de retourner le fichier ;
+- remplacement de toutes les URL publiques de documents dans les templates ;
+- protection contre une traversée de chemin avec `basename()` et réponse 404 lorsque
+  le fichier physique est absent.
+
+### Migration avant déploiement
+
+Copier les fichiers déjà présents vers le nouveau stockage, puis vérifier les droits
+du compte qui exécute PHP :
+
+```bash
+mkdir -p var/documents
+cp -p public/uploads/documents/* var/documents/
+```
+
+Après validation fonctionnelle et sauvegarde, l'ancien dossier public pourra être
+vidé. Cette suppression n'est pas automatisée afin d'éviter toute perte de données.

@@ -23,9 +23,8 @@ Cette limitation doit être levée dans la CI afin de rendre les résultats repr
      templates construisent directement cette URL.
    - Risque : une personne connaissant ou obtenant l'URL peut télécharger un fichier
      sans passer par le contrôle d'autorisation de `DocumentController::show()`.
-   - Correction : déplacer les fichiers hors de `public/`, ajouter une route de
-     téléchargement contrôlée par un voter, migrer les fichiers existants, puis
-     interdire l'accès direct à l'ancien répertoire.
+   - Statut : corrigé dans le lot 4 par stockage sous `var/documents`, route contrôlée
+     et `DocumentVoter`. La copie des fichiers existants reste une étape de déploiement.
 
 2. **Autorisation incomplète sur le module documentaire**
    - Preuve : `/document` n'était couvert par aucune règle `access_control` et la
