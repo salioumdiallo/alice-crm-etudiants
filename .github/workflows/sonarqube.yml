@@ -69,7 +69,6 @@ jobs:
           vendor/bin/phpunit --coverage-clover var/coverage/clover.xml
 
       - name: PHPStan diagnostic
-        continue-on-error: true
         run: phpstan analyse --configuration=phpstan.neon --no-progress
 
       - name: PHP-CS-Fixer diagnostic

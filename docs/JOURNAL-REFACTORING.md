@@ -142,7 +142,7 @@ La première exécution a confirmé que `MoneyType` normalise la saisie `42.50` 
 `42.5` avant son stockage par Doctrine. L'assertion vérifie désormais cette valeur
 réelle, sans modifier la précision décimale déclarée dans la base.
 
-La CI suivante confirme `OK (30 tests, 79 assertions)`.
+La CI suivante confirme `OK (30 tests, 86 assertions)`.
 
 ## 2026-09-15 — Lot 8 : introduction de PHPStan et PHP-CS-Fixer
 
@@ -155,3 +155,12 @@ Les contrôles sont temporairement non bloquants (`continue-on-error`) pendant l
 mesure de la dette existante. Ce choix évite de masquer les régressions PHPUnit tout
 en rendant visibles tous les écarts dans les logs. Après traitement du premier rapport,
 ils seront rendus bloquants et le niveau PHPStan pourra être augmenté progressivement.
+
+### Première mesure
+
+- PHPUnit reste vert : 30 tests et 86 assertions ;
+- PHPStan niveau 0 ne remonte aucune erreur et devient donc immédiatement bloquant ;
+- PHP-CS-Fixer identifie 54 fichiers corrigeables sur 64 analysés.
+
+Le formatage des 54 fichiers sera traité dans des commits dédiés afin de ne pas
+mélanger une réécriture mécanique importante avec les changements fonctionnels.
