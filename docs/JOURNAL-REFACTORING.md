@@ -100,3 +100,9 @@ déclaré. `phpunit.xml.dist` définit maintenant explicitement `App\Kernel`.
 La quatrième exécution a lancé les 26 tests : 10 passaient et 16 échouaient uniquement
 parce que les assertions attendaient `http://localhost/` alors que l'authentificateur
 renvoie la route relative `/`. Les assertions vérifient désormais cette valeur réelle.
+
+La cinquième exécution confirme `OK (26 tests, 48 assertions)`. Son code de sortie
+restait néanmoins à 1 à cause de deux dépréciations indirectes émises par Monolog et
+DAMA Doctrine Test Bundle. `SYMFONY_DEPRECATIONS_HELPER` tolère désormais les avis
+indirects, tout en conservant une tolérance zéro pour les dépréciations directes et
+celles du code du projet.
