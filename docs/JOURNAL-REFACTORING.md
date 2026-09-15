@@ -115,3 +115,8 @@ celles du code du projet.
 - ajout d'un parcours administrateur création → lecture en base → modification →
   suppression d'un partenaire ;
 - validation explicite du jeton CSRF lors de la suppression.
+
+La première exécution du scénario CRUD a montré que Symfony redémarre le kernel entre
+les requêtes du client de test. L'entité précédemment chargée devenait donc détachée.
+Le test conserve maintenant son identifiant et recharge l'entité et son repository
+après chaque requête avant d'effectuer les assertions.

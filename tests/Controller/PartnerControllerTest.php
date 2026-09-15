@@ -57,8 +57,9 @@ final class PartnerControllerTest extends WebTestCase
         $partner = $repository->findOneBy(['name' => 'Partenaire test']);
         self::assertInstanceOf(Partner::class, $partner);
         self::assertSame(12, $partner->getDiscountRate());
+        $partnerId = $partner->getId();
 
-        $client->request('GET', sprintf('/admin/partenaire/%d/modifier', $partner->getId()));
+        $client->request('GET', sprintf('/admin/partenaire/%d/modifier', $partnerId));
         self::assertResponseIsSuccessful();
         $client->submitForm('Modifier', [
             'partner[name]' => 'Partenaire modifié',
@@ -66,17 +67,19 @@ final class PartnerControllerTest extends WebTestCase
         ]);
         self::assertResponseRedirects('/admin/partenaire/', 303);
 
-        $entityManager = static::getContainer()->get(EntityManagerInterface::class);
-        $entityManager->refresh($partner);
+        $repository = static::getContainer()->get(PartnerRepository::class);
+        $partner = $repository->find($partnerId);
+        self::assertInstanceOf(Partner::class, $partner);
         self::assertSame('Partenaire modifié', $partner->getName());
         self::assertSame(18, $partner->getDiscountRate());
 
         $csrfTokenManager = static::getContainer()->get(CsrfTokenManagerInterface::class);
-        $client->request('POST', sprintf('/admin/partenaire/%d', $partner->getId()), [
-            '_token' => $csrfTokenManager->getToken('delete'.$partner->getId())->getValue(),
+        $client->request('POST', sprintf('/admin/partenaire/%d', $partnerId), [
+            '_token' => $csrfTokenManager->getToken('delete'.$partnerId)->getValue(),
         ]);
         self::assertResponseRedirects('/admin/partenaire/', 303);
-        self::assertNull($repository->find($partner->getId()));
+        $repository = static::getContainer()->get(PartnerRepository::class);
+        self::assertNull($repository->find($partnerId));
     }
 
     private function persistUser(array $roles): User
