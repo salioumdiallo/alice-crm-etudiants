@@ -106,3 +106,12 @@ restait néanmoins à 1 à cause de deux dépréciations indirectes émises par 
 DAMA Doctrine Test Bundle. `SYMFONY_DEPRECATIONS_HELPER` tolère désormais les avis
 indirects, tout en conservant une tolérance zéro pour les dépréciations directes et
 celles du code du projet.
+
+## 2026-09-15 — Lot 6 : premier scénario CRUD authentifié
+
+- confirmation par la CI : 26 tests et 48 assertions passent ;
+- ajout d'un test garantissant qu'un utilisateur standard reçoit 403 sur
+  l'administration des partenaires ;
+- ajout d'un parcours administrateur création → lecture en base → modification →
+  suppression d'un partenaire ;
+- validation explicite du jeton CSRF lors de la suppression.
