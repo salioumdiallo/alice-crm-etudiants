@@ -159,8 +159,20 @@ ils seront rendus bloquants et le niveau PHPStan pourra être augmenté progress
 ### Première mesure
 
 - PHPUnit reste vert : 30 tests et 86 assertions ;
-- PHPStan niveau 0 ne remonte aucune erreur et devient donc immédiatement bloquant ;
+- l'état apparent de PHPStan était masqué par `continue-on-error` ; une exécution
+  bloquante révèle trois erreurs au niveau 0 ;
 - PHP-CS-Fixer identifie 54 fichiers corrigeables sur 64 analysés.
 
 Le formatage des 54 fichiers sera traité dans des commits dédiés afin de ne pas
 mélanger une réécriture mécanique importante avec les changements fonctionnels.
+
+### Corrections du premier rapport PHPStan
+
+- ajout du retour HTTP manquant dans `ContactController::deleteContact()` lorsque le
+  jeton CSRF est invalide, avec redirection vers le client ou l'utilisateur concerné ;
+- fusion des attributs CSS `class` dupliqués dans `NewUserType` et `RegisterType` ;
+- conservation explicite de la classe `g-recaptcha`, précédemment écrasée par la
+  seconde clé `class` du tableau PHP.
+
+PHPStan reste bloquant : la prochaine CI doit confirmer que ces trois erreurs sont
+entièrement corrigées.

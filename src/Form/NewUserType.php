@@ -122,10 +122,9 @@ class NewUserType extends AbstractType
             ->add('submit', SubmitType::class, [
                 'label' => 'Enregistrer',
                 'attr' => [
-                    'class' => 'btn-alice',
+                    'class' => 'btn-alice btn-alice-form',
                     'data-callback' => 'onSubmit',
                     'data-action' => 'submit',
-                    'class' => 'btn-alice-form'
                 ]
             ])
         ;

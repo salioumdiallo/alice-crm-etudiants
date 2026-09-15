@@ -180,6 +180,15 @@ class ContactController extends AbstractController
                 'error',
                 'Vous ne pouvez pas supprimer cet élément.'
             );
+
+            if ($customer = $user->getCustomer()) {
+                return $this->redirectToRoute('app_customer', [
+                    'id' => $customer->getId(),
+                    'slug' => $customer->getSlug(),
+                ]);
+            }
+
+            return $this->redirectToRoute('app_user_show', ['id' => $userId, 'slug' => $slug]);
         } else {
             // si le contact est lié à un client + redirect sur la page client 
             if($user->getCustomer()){

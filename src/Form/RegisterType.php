@@ -141,11 +141,10 @@ class RegisterType extends AbstractType
             ->add('submit', SubmitType::class, [
                 'label' => 'S\'inscrire',
                 'attr' => [
-                    'class' => 'btn-alice g-recaptcha',
+                    'class' => 'btn-alice g-recaptcha btn-alice-form',
                     'data-sitekey' => 'reCAPTCHA_site_key',
                     'data-callback' => 'onSubmit',
                     'data-action' => 'submit',
-                    'class' => 'btn-alice-form'
                 ]
             ])
             ->add('captcha', Recaptcha3Type::class, [
