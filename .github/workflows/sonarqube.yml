@@ -52,6 +52,9 @@ jobs:
           extensions: ctype, iconv, intl, pdo_pgsql
           coverage: pcov
 
+      - name: Prepare Symfony environment file
+        run: cp .env.example .env
+
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
 

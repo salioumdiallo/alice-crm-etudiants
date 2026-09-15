@@ -80,3 +80,10 @@ vidé. Cette suppression n'est pas automatisée afin d'éviter toute perte de do
 
 L'exécution locale reste à confirmer sur un poste disposant de PHP et Composer. Les
 prochains tests devront couvrir les opérations CRUD authentifiées et les réponses 403.
+
+### Correction après première exécution CI
+
+La première exécution a échoué pendant `composer install` : les scripts Symfony
+cherchaient un fichier `.env` absent du dépôt. Le workflow copie désormais
+`.env.example` vers `.env` avant l'installation. Les valeurs non sensibles de test
+restent imposées par l'environnement GitHub Actions.
