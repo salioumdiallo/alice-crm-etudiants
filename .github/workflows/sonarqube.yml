@@ -28,7 +28,8 @@ jobs:
     env:
       APP_ENV: test
       APP_SECRET: test-secret-not-for-production
-      DATABASE_URL: postgresql://alice:alice_test@127.0.0.1:5432/alice_test?serverVersion=15&charset=utf8
+      # Doctrine adds the `_test` suffix in config/packages/doctrine.yaml.
+      DATABASE_URL: postgresql://alice:alice_test@127.0.0.1:5432/alice?serverVersion=15&charset=utf8
       MAILER_DSN: null://null
       MESSENGER_TRANSPORT_DSN: sync://
       RECAPTCHA3_KEY: test

@@ -87,3 +87,8 @@ La première exécution a échoué pendant `composer install` : les scripts Symf
 cherchaient un fichier `.env` absent du dépôt. Le workflow copie désormais
 `.env.example` vers `.env` avant l'installation. Les valeurs non sensibles de test
 restent imposées par l'environnement GitHub Actions.
+
+La deuxième exécution a atteint PostgreSQL, mais cherchait `alice_test_test` : le nom
+`alice_test` présent dans l'URL recevait une seconde fois le suffixe `_test` défini
+dans `config/packages/doctrine.yaml`. L'URL utilise désormais la base logique `alice` ;
+Doctrine construit ainsi le nom final attendu `alice_test`.
