@@ -52,6 +52,7 @@ jobs:
           php-version: '8.2'
           extensions: ctype, iconv, intl, pdo_pgsql
           coverage: pcov
+          tools: phpstan:1.12.32, php-cs-fixer:3.64.0
 
       - name: Prepare Symfony environment file
         run: cp .env.example .env
@@ -66,6 +67,14 @@ jobs:
         run: |
           mkdir -p var/coverage
           vendor/bin/phpunit --coverage-clover var/coverage/clover.xml
+
+      - name: PHPStan diagnostic
+        continue-on-error: true
+        run: phpstan analyse --configuration=phpstan.neon --no-progress
+
+      - name: PHP-CS-Fixer diagnostic
+        continue-on-error: true
+        run: php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --diff
 
       - name: SonarQube scan
         if: env.SONAR_TOKEN != '' && env.SONAR_HOST_URL != ''

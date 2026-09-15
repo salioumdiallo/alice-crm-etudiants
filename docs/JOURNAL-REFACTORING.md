@@ -141,3 +141,17 @@ de l'exécution PostgreSQL dans GitHub Actions.
 La première exécution a confirmé que `MoneyType` normalise la saisie `42.50` en
 `42.5` avant son stockage par Doctrine. L'assertion vérifie désormais cette valeur
 réelle, sans modifier la précision décimale déclarée dans la base.
+
+La CI suivante confirme `OK (30 tests, 79 assertions)`.
+
+## 2026-09-15 — Lot 8 : introduction de PHPStan et PHP-CS-Fixer
+
+- ajout de `phpstan.neon` sur le dossier `src`, au niveau initial 0 ;
+- ajout de `.php-cs-fixer.dist.php` pour `src` et `tests`, basé sur les règles Symfony ;
+- installation de versions épinglées par l'environnement PHP de GitHub Actions ;
+- ajout des deux diagnostics dans la CI après les tests PHPUnit.
+
+Les contrôles sont temporairement non bloquants (`continue-on-error`) pendant la
+mesure de la dette existante. Ce choix évite de masquer les régressions PHPUnit tout
+en rendant visibles tous les écarts dans les logs. Après traitement du premier rapport,
+ils seront rendus bloquants et le niveau PHPStan pourra être augmenté progressivement.
