@@ -11,6 +11,34 @@ permissions:
 jobs:
   quality:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: alice_test
+          POSTGRES_USER: alice
+          POSTGRES_PASSWORD: alice_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U alice -d alice_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      APP_ENV: test
+      APP_SECRET: test-secret-not-for-production
+      DATABASE_URL: postgresql://alice:alice_test@127.0.0.1:5432/alice_test?serverVersion=15&charset=utf8
+      MAILER_DSN: null://null
+      MESSENGER_TRANSPORT_DSN: sync://
+      RECAPTCHA3_KEY: test
+      RECAPTCHA3_SECRET: test
+      MJ_APIKEY_PUBLIC: test
+      MJ_APIKEY_PRIVATE: test
+      APP_GOOGLESEARCH_API_KEY: test
+      GOOGLE_CUSTOM_SEARCH_API_KEY: test
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,13 +55,14 @@ jobs:
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
 
+      - name: Create test schema
+        run: php bin/console doctrine:schema:create --env=test
+
       - name: Run tests and generate coverage
         run: |
           mkdir -p var/coverage
           vendor/bin/phpunit --coverage-clover var/coverage/clover.xml
 
       - name: SonarQube scan
+        if: env.SONAR_TOKEN != '' && env.SONAR_HOST_URL != ''
         uses: SonarSource/sonarqube-scan-action@v6
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}

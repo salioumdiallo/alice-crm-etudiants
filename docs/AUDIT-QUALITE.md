@@ -50,12 +50,10 @@ Cette limitation doit être levée dans la CI afin de rendre les résultats repr
 ### P1 — Corriger juste après les risques critiques
 
 5. **Suite de tests non opérationnelle**
-   - 12 appels à `markTestIncomplete()` dans trois contrôleurs de test.
-   - Les jeux de données générés sont incompatibles avec les types des entités
-     (`DateTimeInterface`, collections Doctrine, nombres).
-   - Certains chemins attendus ne correspondent plus aux routes actuelles.
-   - Correction : fixtures dédiées, authentification explicite admin/utilisateur,
-     tests d'autorisation 302/403, tests CRUD et tests de propriété des documents.
+   - Les 12 appels à `markTestIncomplete()` et les données invalides ont été retirés.
+   - Des tests d'accès anonymes et des tests unitaires du `DocumentVoter` ont été ajoutés.
+   - Restent à ajouter : fixtures dédiées, tests CRUD authentifiés et tests complets
+     de propriété des documents.
 
 6. **Absence de CI qualité**
    - Une configuration SonarQube et un workflow GitHub Actions ont été ajoutés dans

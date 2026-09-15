@@ -68,3 +68,15 @@ cp -p public/uploads/documents/* var/documents/
 
 Après validation fonctionnelle et sauvegarde, l'ancien dossier public pourra être
 vidé. Cette suppression n'est pas automatisée afin d'éviter toute perte de données.
+
+## 2026-09-15 — Lot 5 : socle de tests et CI
+
+- remplacement de 12 tests incomplets générés par des tests de contrôle d'accès ;
+- correction des chemins de test pour correspondre aux routes réelles ;
+- ajout de tests unitaires du `DocumentVoter` pour les rôles administrateur,
+  utilisateur affecté et utilisateur non autorisé ;
+- ajout d'un service PostgreSQL et de la création du schéma de test dans la CI ;
+- configuration de valeurs factices pour éviter l'utilisation de secrets réels.
+
+L'exécution locale reste à confirmer sur un poste disposant de PHP et Composer. Les
+prochains tests devront couvrir les opérations CRUD authentifiées et les réponses 403.
