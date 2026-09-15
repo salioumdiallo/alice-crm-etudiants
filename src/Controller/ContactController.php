@@ -165,14 +165,14 @@ class ContactController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/{slug}/supprimer', name: 'app_contact_delete')]
+    #[Route('/{id}/{slug}/supprimer', name: 'app_contact_delete', methods: ['POST'])]
     public function deleteContact(Request $request, $id): Response
     {
         $contact = $this->contactRepository->findOneById($id);
         $user = $contact->getUser();
         $userId = $user->getId();
         $slug = $user->getSlug();
-        $csrf_token = $request->query->get('csrf_token', '');
+        $csrf_token = $request->request->get('_token', '');
 
         
         if (!$this->isCsrfTokenValid('delete_contact' . $contact->getId(), $csrf_token)) {

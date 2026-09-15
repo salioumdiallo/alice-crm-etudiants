@@ -204,14 +204,14 @@ class ContractController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/supprimer', name: 'app_contract_remove')]
+    #[Route('/{id}/supprimer', name: 'app_contract_remove', methods: ['POST'])]
     public function removeContract(Contract $contract, Request $request): Response
     {
 
         $customer = $contract->getCustomer();
         $customerId = $customer->getId();
         $customerSlug = $customer->getSlug();
-        $csrf_token = $request->query->get('csrf_token', '');
+        $csrf_token = $request->request->get('_token', '');
 
         if (!$this->isCsrfTokenValid('delete_contract' . $contract->getId(), $csrf_token)) {
 
@@ -233,14 +233,14 @@ class ContractController extends AbstractController
 
     }
 
-    #[Route('/{id}/supprimer-serp-info/{serpInfoId}', name: 'app_serp_info_remove')]
+    #[Route('/{id}/supprimer-serp-info/{serpInfoId}', name: 'app_serp_info_remove', methods: ['POST'])]
     #[ParamConverter('serpInfo', options: ['id' => 'serpInfoId'])]
     public function removeSerpInfo(SerpInfo $serpInfo, Request $request, EntityManagerInterface $entityManager, PersistenceManagerRegistry $doctrine): Response
     {
 
         $contract = $serpInfo->getContract();
         $contractId = $contract->getId();
-        $csrf_token = $request->query->get('csrf_token', '');
+        $csrf_token = $request->request->get('_token', '');
 
         if (!$this->isCsrfTokenValid('delete_serp_info' . $serpInfo->getId(), $csrf_token)) {
 

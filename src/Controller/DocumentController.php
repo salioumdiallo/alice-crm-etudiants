@@ -155,7 +155,8 @@ class DocumentController extends AbstractController
     public function edit(Request $request, Document $document, AuthorizationCheckerInterface $authChecker): Response
     {
         // only ADMIN is authorized to edit document
-        
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $isAuthorized = $authChecker->isGranted('ROLE_ADMIN');
 
         if ($this->isGranted('ROLE_ADMIN')) {
@@ -185,6 +186,8 @@ class DocumentController extends AbstractController
     #[Route('/{id}', name: 'app_document_delete', methods: ['POST'])]
     public function delete(Request $request, Document $document): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         if ($this->isCsrfTokenValid('delete'.$document->getId(), $request->request->get('_token'))) {
             $this->documentRepository->remove($document, true);
         }

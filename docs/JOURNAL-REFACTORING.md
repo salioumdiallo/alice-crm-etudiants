@@ -1,0 +1,47 @@
+# Journal des corrections et refactorisations
+
+Ce journal doit être mis à jour à chaque lot. Une entrée décrit le problème, le
+choix effectué, les fichiers modifiés, la vérification réalisée et les risques restants.
+
+## 2026-09-15 — Lot 1 : protection du module documentaire
+
+### Problème
+
+Les routes `/document` n'étaient pas protégées globalement. La suppression d'un
+document vérifiait le jeton CSRF, mais pas le rôle administrateur côté serveur.
+Masquer le bouton dans Twig ne constitue pas un contrôle d'accès.
+
+### Correction
+
+- ajout de `^/document -> ROLE_USER` dans `config/packages/security.yaml` ;
+- refus explicite des utilisateurs non administrateurs sur l'édition ;
+- refus explicite des utilisateurs non administrateurs sur la suppression.
+
+### Vérification
+
+- revue statique du routage et du contrôleur ;
+- tests automatiques non exécutés : PHP et Composer sont absents de l'environnement.
+
+### Suite obligatoire
+
+Les fichiers restent servis depuis `public/uploads/documents`. Le prochain lot doit
+les déplacer dans un stockage privé et ajouter une route de téléchargement avec un
+contrôle d'accès centralisé (voter). La migration des fichiers existants devra être
+prévue avant le déploiement.
+
+## 2026-09-15 — Lot 3 : suppressions via POST
+
+- les suppressions de contacts, contrats et mots-clés SERP n'acceptent plus GET ;
+- les jetons CSRF sont maintenant transmis dans le corps d'un formulaire HTML ;
+- les liens de suppression ont été remplacés par des formulaires POST confirmés ;
+- vérification statique réalisée avec `git diff --check` ; PHPUnit reste à exécuter
+  dès qu'un environnement PHP/Composer sera disponible.
+
+## 2026-09-15 — Lot 2 : préparation de l'analyse SonarQube
+
+- ajout de `sonar-project.properties` avec les sources, tests, exclusions et rapport
+  de couverture PHPUnit ;
+- ajout du workflow `.github/workflows/sonarqube.yml` déclenché sur `main` et les PR ;
+- exécution non possible dans cet environnement faute de PHP, Composer, Docker et
+  SonarScanner ; la première exécution doit donc être faite après configuration des
+  secrets GitHub `SONAR_TOKEN` et `SONAR_HOST_URL`.

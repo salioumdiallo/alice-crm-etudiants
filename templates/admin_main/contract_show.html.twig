@@ -13,7 +13,10 @@
     <div class="d-flex my-2 me-md-1 justify-content-end d-lg-flex">
 
         <a href="{{ path('app_contract_edit', { 'id': contract.id }) }}" class="btn-fa-action-head-page mx-2"><i class="fa-solid fa-pen-to-square fa-xl"></i></a>
-        <a href="{{ path('app_contract_remove', { 'id': contract.id, 'csrf_token': csrf_token('delete_contract' ~ contract.id) }) }}" class="btn-fa-action-head-supp mx-2 btn-delete" data-name="Contrat {{ contract.name }}"><i class="fa-solid fa-trash fa-xl"></i></a>
+        <form method="post" action="{{ path('app_contract_remove', { 'id': contract.id }) }}" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce contrat ?');">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete_contract' ~ contract.id) }}">
+            <button type="submit" class="btn-fa-action-head-supp mx-2 border-0 bg-transparent" aria-label="Supprimer le contrat"><i class="fa-solid fa-trash fa-xl"></i></button>
+        </form>
 
     </div>
 
@@ -113,7 +116,10 @@
                     data-keyword="{{ serpInfo.id }}" 
                     data-google-api-key="{{ googleApiKey }}" 
                     data-google-custom-api-key="{{ googleCustomApiKey }}">
-                <a href="{{ path('app_serp_info_remove', { 'id': contract.id, 'serpInfoId': serpInfo.id, 'csrf_token': csrf_token('delete_serp_info' ~ serpInfo.id) }) }}" class="btn btn-block btn-sm btn-outline-danger col-3 offset-1 col-md-1 offset-md-1" id="btn-sup-keyword">X</a>
+                <form method="post" action="{{ path('app_serp_info_remove', { 'id': contract.id, 'serpInfoId': serpInfo.id }) }}" class="col-3 offset-1 col-md-1 offset-md-1" onsubmit="return confirm('Supprimer ce mot-clé ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete_serp_info' ~ serpInfo.id) }}">
+                    <button type="submit" class="btn btn-block btn-sm btn-outline-danger" id="btn-sup-keyword">X</button>
+                </form>
                 <div type="text" class="keyword fw-semibold col-6 col-md-5 offset-md-1">
                     {{ serpInfo.keyword|capitalize }}
                 </div>
@@ -147,4 +153,3 @@
 </div>
     <script src="{{ asset('assets/js/serp_checker.js') }}"></script>
 {% endblock %}
-

@@ -28,7 +28,10 @@
     <div class="d-flex flex-column align-items-center flex-sm-row flex-sm-wrap mb-3 me-md-1 justify-content-center justify-content-lg-end">
         <a href="{{ path('app_contact_edit', { 'id': contact.id, 'slug': contact.slug }) }}" class="btn btn-alice btn-block mx-3">Modifier</a>        
 
-        <a href="{{ path('app_contact_delete', { 'id': contact.id, 'slug': contact.slug, 'csrf_token': csrf_token('delete_contact' ~ contact.id) }) }}" class="btn btn-alice-supp mx-3 btn-delete" data-name="Contact {{ contact.firstname|capitalize }} {{ contact.lastname|upper }}">Supprimer</a> 
+        <form method="post" action="{{ path('app_contact_delete', { 'id': contact.id, 'slug': contact.slug }) }}" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce contact ?');">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete_contact' ~ contact.id) }}">
+            <button type="submit" class="btn btn-alice-supp mx-3">Supprimer</button>
+        </form>
 
     </div>
 
