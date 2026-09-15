@@ -137,3 +137,7 @@ le stockage du jeton en session et reproduit le parcours du navigateur.
 Les entités et repositories sont rechargés après chaque redémarrage du kernel de test,
 selon le retour d'expérience du scénario Partenaires. La validation définitive dépend
 de l'exécution PostgreSQL dans GitHub Actions.
+
+La première exécution a confirmé que `MoneyType` normalise la saisie `42.50` en
+`42.5` avant son stockage par Doctrine. L'assertion vérifie désormais cette valeur
+réelle, sans modifier la précision décimale déclarée dans la base.

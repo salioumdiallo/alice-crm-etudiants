@@ -54,7 +54,7 @@ final class TariffZoneControllerTest extends WebTestCase
         $repository = static::getContainer()->get(TariffZoneRepository::class);
         $tariffZone = $repository->findOneBy(['name' => 'Zone test']);
         self::assertInstanceOf(TariffZone::class, $tariffZone);
-        self::assertSame('42.50', $tariffZone->getAmount());
+        self::assertSame('42.5', $tariffZone->getAmount());
         $tariffZoneId = $tariffZone->getId();
 
         $client->request('GET', sprintf('/admin/tariff_zone/%d/modifier', $tariffZoneId));
