@@ -125,3 +125,15 @@ La deuxième exécution du CRUD échouait lors de la génération directe du jet
 car aucun contexte de requête n'avait ouvert la session. Le test charge maintenant la
 page de détail et soumet son véritable formulaire de suppression, ce qui couvre aussi
 le stockage du jeton en session et reproduit le parcours du navigateur.
+
+## 2026-09-15 — Lot 7 : scénario CRUD des zones tarifaires
+
+- ajout d'un contrôle garantissant qu'un utilisateur standard reçoit une réponse 403 ;
+- ajout d'un parcours administrateur création → lecture en base → modification →
+  suppression d'une zone tarifaire ;
+- soumission du formulaire réel de suppression afin de couvrir le jeton CSRF et la
+  session comme dans le navigateur.
+
+Les entités et repositories sont rechargés après chaque redémarrage du kernel de test,
+selon le retour d'expérience du scénario Partenaires. La validation définitive dépend
+de l'exécution PostgreSQL dans GitHub Actions.
