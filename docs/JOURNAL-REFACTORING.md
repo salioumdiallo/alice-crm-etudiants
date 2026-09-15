@@ -96,3 +96,7 @@ Doctrine construit ainsi le nom final attendu `alice_test`.
 La troisième exécution a créé le schéma avec succès et découvert 26 tests. Seize tests
 fonctionnels échouaient avant démarrage du kernel parce que `KERNEL_CLASS` n'était pas
 déclaré. `phpunit.xml.dist` définit maintenant explicitement `App\Kernel`.
+
+La quatrième exécution a lancé les 26 tests : 10 passaient et 16 échouaient uniquement
+parce que les assertions attendaient `http://localhost/` alors que l'authentificateur
+renvoie la route relative `/`. Les assertions vérifient désormais cette valeur réelle.

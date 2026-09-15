@@ -12,7 +12,7 @@ final class TariffZoneControllerTest extends WebTestCase
         $client = static::createClient();
         $client->request($method, $path);
 
-        self::assertResponseRedirects('http://localhost/');
+        self::assertResponseRedirects('/');
     }
 
     public static function adminRoutes(): iterable
