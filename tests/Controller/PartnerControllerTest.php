@@ -7,7 +7,6 @@ use App\Entity\User;
 use App\Repository\PartnerRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 final class PartnerControllerTest extends WebTestCase
 {
@@ -73,10 +72,9 @@ final class PartnerControllerTest extends WebTestCase
         self::assertSame('Partenaire modifié', $partner->getName());
         self::assertSame(18, $partner->getDiscountRate());
 
-        $csrfTokenManager = static::getContainer()->get(CsrfTokenManagerInterface::class);
-        $client->request('POST', sprintf('/admin/partenaire/%d', $partnerId), [
-            '_token' => $csrfTokenManager->getToken('delete'.$partnerId)->getValue(),
-        ]);
+        $crawler = $client->request('GET', sprintf('/admin/partenaire/%d', $partnerId));
+        self::assertResponseIsSuccessful();
+        $client->submit($crawler->selectButton('Supprimer')->form());
         self::assertResponseRedirects('/admin/partenaire/', 303);
         $repository = static::getContainer()->get(PartnerRepository::class);
         self::assertNull($repository->find($partnerId));

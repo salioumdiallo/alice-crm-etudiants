@@ -120,3 +120,8 @@ La première exécution du scénario CRUD a montré que Symfony redémarre le ke
 les requêtes du client de test. L'entité précédemment chargée devenait donc détachée.
 Le test conserve maintenant son identifiant et recharge l'entité et son repository
 après chaque requête avant d'effectuer les assertions.
+
+La deuxième exécution du CRUD échouait lors de la génération directe du jeton CSRF,
+car aucun contexte de requête n'avait ouvert la session. Le test charge maintenant la
+page de détail et soumet son véritable formulaire de suppression, ce qui couvre aussi
+le stockage du jeton en session et reproduit le parcours du navigateur.
