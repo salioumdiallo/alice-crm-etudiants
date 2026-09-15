@@ -92,3 +92,7 @@ La deuxième exécution a atteint PostgreSQL, mais cherchait `alice_test_test` :
 `alice_test` présent dans l'URL recevait une seconde fois le suffixe `_test` défini
 dans `config/packages/doctrine.yaml`. L'URL utilise désormais la base logique `alice` ;
 Doctrine construit ainsi le nom final attendu `alice_test`.
+
+La troisième exécution a créé le schéma avec succès et découvert 26 tests. Seize tests
+fonctionnels échouaient avant démarrage du kernel parce que `KERNEL_CLASS` n'était pas
+déclaré. `phpunit.xml.dist` définit maintenant explicitement `App\Kernel`.
