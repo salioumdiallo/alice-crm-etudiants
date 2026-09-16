@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Class;
 
 use Mailjet\Client;
@@ -7,22 +9,35 @@ use Mailjet\Resources;
 
 class Mail
 {
-    public function ConfirmEmailSend($api_key_public, $api_key_secret,
-        // $to_email, $to_name,
-        $title, $subject, $content, $sign_key)
-    {
-        $mj = new Client($api_key_public, $api_key_secret, true, ['version' => 'v3.1']); // instance de l'objet email
-        $body = [ // création du corps du mail
+    private const SENDER_EMAIL = 'no-reply@alice-le-blog.fr';
+    private const SENDER_NAME = 'Alice CRM';
+
+    public function confirmEmailSend(
+        string $apiKeyPublic,
+        string $apiKeySecret,
+        string $title,
+        string $subject,
+        string $content,
+        string $signKey,
+    ): void {
+        $client = new Client(
+            $apiKeyPublic,
+            $apiKeySecret,
+            true,
+            ['version' => 'v3.1']
+        );
+
+        $body = [
             'Messages' => [
                 [
                     'From' => [
-                        'Email' => 'no-reply@alice-le-blog.fr',
-                        'Name' => 'Alice CRM',
+                        'Email' => self::SENDER_EMAIL,
+                        'Name' => self::SENDER_NAME,
                     ],
                     'To' => [
                         [
-                            'Email' => 'no-reply@alice-le-blog.fr',
-                            'Name' => 'Alice CRM',
+                            'Email' => self::SENDER_EMAIL,
+                            'Name' => self::SENDER_NAME,
                         ],
                     ],
                     'TemplateID' => 4672993,
@@ -30,36 +45,43 @@ class Mail
                     'Subject' => $subject,
                     'variables' => [
                         'content' => $content,
-                        'sign_key' => $sign_key,
+                        'sign_key' => $signKey,
                         'title' => $title,
                     ],
-
-                    // 'Variables' => json_decode('{
-                    //     "content": ""
-                    // }', true)
                 ],
             ],
         ];
-        $response = $mj->post(Resources::$Email, ['body' => $body]); // on passe le corps du mail à $mj->post pour qu'il l'envoi
-        $response->success() && var_dump($response->getData()); // on regarde la réponse
+
+        $client->post(Resources::$Email, ['body' => $body]);
     }
 
-    public function sendResetPassword($api_key_public, $api_key_secret,
-        // $to_email, $to_name,
-        $title, $subject, $content, $sign_key, $token)
-    {
-        $mj = new Client($api_key_public, $api_key_secret, true, ['version' => 'v3.1']); // instance de l'objet email
-        $body = [ // création du corps du mail
+    public function sendResetPassword(
+        string $apiKeyPublic,
+        string $apiKeySecret,
+        string $title,
+        string $subject,
+        string $content,
+        string $signKey,
+        string $token,
+    ): void {
+        $client = new Client(
+            $apiKeyPublic,
+            $apiKeySecret,
+            true,
+            ['version' => 'v3.1']
+        );
+
+        $body = [
             'Messages' => [
                 [
                     'From' => [
-                        'Email' => 'no-reply@alice-le-blog.fr',
-                        'Name' => 'Alice CRM',
+                        'Email' => self::SENDER_EMAIL,
+                        'Name' => self::SENDER_NAME,
                     ],
                     'To' => [
                         [
-                            'Email' => 'no-reply@alice-le-blog.fr',
-                            'Name' => 'Alice CRM',
+                            'Email' => self::SENDER_EMAIL,
+                            'Name' => self::SENDER_NAME,
                         ],
                     ],
                     'TemplateID' => 4684557,
@@ -67,18 +89,14 @@ class Mail
                     'Subject' => $subject,
                     'variables' => [
                         'content' => $content,
-                        'sign_key' => $sign_key,
+                        'sign_key' => $signKey,
                         'title' => $title,
                         'token' => $token,
                     ],
-
-                    // 'Variables' => json_decode('{
-                    //     "content": ""
-                    // }', true)
                 ],
             ],
         ];
-        $response = $mj->post(Resources::$Email, ['body' => $body]); // on passe le corps du mail à $mj->post pour qu'il l'envoi
-        $response->success() && var_dump($response->getData()); // on regarde la réponse
+
+        $client->post(Resources::$Email, ['body' => $body]);
     }
 }

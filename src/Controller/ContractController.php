@@ -16,6 +16,7 @@ use App\Service\GoogleSearchService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -61,72 +62,14 @@ class ContractController extends AbstractController
         $serpInfoForm->handleRequest($request);
 
         if ($serpInfoForm->isSubmitted() && $serpInfoForm->isValid()) {
-            $newSerpInfo = new SerpInfo();
-            $newKeyword = $serpInfoForm->get('keyword')->getData();
-
-            $newSerpInfo->setKeyword($newKeyword);
-            $newSerpInfo->setContract($contract);
-
-            $this->entityManager->persist($newSerpInfo);
-            $this->entityManager->flush();
-
-            $this->addFlash(
-                'success',
-                'Mot clé enregistré avec succès.'
-            );
-
-            return $this->redirectToRoute('app_contract_show', [
-                'id' => $id,
-            ]);
+            return $this->handleSerpInfoForm($serpInfoForm, $contract);
         }
 
         $serpResultForm = $this->createForm(SerpResultType::class);
         $serpResultForm->handleRequest($request);
 
         if ($serpResultForm->isSubmitted() && $serpResultForm->isValid()) {
-            $newSerpResults = [];
-
-            foreach ($serpInfos as $serpInfo) {
-                $keyword = $serpInfo->getKeyword();
-
-                $newRank = $this->googleSearchService->findWebsiteRank(
-                    $keyword,
-                    $contract->getWebsiteLink()
-                );
-
-                if (null === $newRank) {
-                    continue;
-                }
-
-                $newSerpResult = new SerpResult();
-                $newSerpResult->setGoogleRank($newRank);
-                $newSerpResult->setSerpInfo($serpInfo);
-                $newSerpResult->setDate(new \DateTime());
-
-                $newSerpResults[] = $newSerpResult;
-            }
-
-            if ([] !== $newSerpResults) {
-                foreach ($newSerpResults as $newSerpResult) {
-                    $this->entityManager->persist($newSerpResult);
-                }
-
-                $this->entityManager->flush();
-
-                $this->addFlash(
-                    'success',
-                    'Rangs enregistrés avec succès.'
-                );
-            } else {
-                $this->addFlash(
-                    'error',
-                    'Le site n\'a été trouvé dans les résultats de recherche Google pour aucun des mots-clés.'
-                );
-            }
-
-            return $this->redirectToRoute('app_contract_show', [
-                'id' => $id,
-            ]);
+            return $this->handleSerpResultForm($contract);
         }
 
         return $this->render('admin_main/contract_show.html.twig', [
@@ -278,6 +221,78 @@ class ContractController extends AbstractController
 
         return $this->redirectToRoute('app_contract_show', [
             'id' => $contractId,
+        ]);
+    }
+
+    private function handleSerpInfoForm(
+        FormInterface $serpInfoForm,
+        Contract $contract,
+    ): Response {
+        $newSerpInfo = new SerpInfo();
+        $newKeyword = $serpInfoForm->get('keyword')->getData();
+
+        $newSerpInfo->setKeyword($newKeyword);
+        $newSerpInfo->setContract($contract);
+
+        $this->entityManager->persist($newSerpInfo);
+        $this->entityManager->flush();
+
+        $this->addFlash(
+            'success',
+            'Mot clé enregistré avec succès.'
+        );
+
+        return $this->redirectToRoute('app_contract_show', [
+            'id' => $contract->getId(),
+        ]);
+    }
+
+    private function handleSerpResultForm(Contract $contract): Response
+    {
+        $newSerpResults = [];
+
+        foreach ($contract->getSerpInfos() as $serpInfo) {
+            $newRank = $this->googleSearchService->findWebsiteRank(
+                $serpInfo->getKeyword(),
+                $contract->getWebsiteLink()
+            );
+
+            if (null === $newRank) {
+                continue;
+            }
+
+            $newSerpResult = new SerpResult();
+            $newSerpResult->setGoogleRank($newRank);
+            $newSerpResult->setSerpInfo($serpInfo);
+            $newSerpResult->setDate(new \DateTime());
+
+            $newSerpResults[] = $newSerpResult;
+        }
+
+        if ([] === $newSerpResults) {
+            $this->addFlash(
+                'error',
+                'Le site n\'a été trouvé dans les résultats de recherche Google pour aucun des mots-clés.'
+            );
+
+            return $this->redirectToRoute('app_contract_show', [
+                'id' => $contract->getId(),
+            ]);
+        }
+
+        foreach ($newSerpResults as $newSerpResult) {
+            $this->entityManager->persist($newSerpResult);
+        }
+
+        $this->entityManager->flush();
+
+        $this->addFlash(
+            'success',
+            'Rangs enregistrés avec succès.'
+        );
+
+        return $this->redirectToRoute('app_contract_show', [
+            'id' => $contract->getId(),
         ]);
     }
 }

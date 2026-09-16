@@ -25,6 +25,8 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class CustomerType extends AbstractType
 {
+    private const REQUIRED_FIELD_MESSAGE = 'Ce champ ne peut pas être vide.';
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -32,7 +34,7 @@ class CustomerType extends AbstractType
                 'label' => 'Nom',
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Ce champ ne peut pas être vide.',
+                        'message' => self::REQUIRED_FIELD_MESSAGE,
                     ]),
                     new Regex([
                         'pattern' => '/^[\p{L}0-9\s\'-]*$/u',
@@ -53,7 +55,11 @@ class CustomerType extends AbstractType
                                 return;
                             }
 
-                            $numSirenSiret = str_replace(' ', '', (string) $numSirenSiret);
+                            $numSirenSiret = str_replace(
+                                ' ',
+                                '',
+                                (string) $numSirenSiret
+                            );
 
                             if (!preg_match('/^(?:\d{9}|\d{14})$/', $numSirenSiret)) {
                                 $context->addViolation(
@@ -73,7 +79,7 @@ class CustomerType extends AbstractType
                 'label' => 'Adresse',
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Ce champ ne peut pas être vide.',
+                        'message' => self::REQUIRED_FIELD_MESSAGE,
                     ]),
                     new Regex([
                         'pattern' => '/^[\p{L}0-9\s\'-]*$/u',
@@ -93,7 +99,7 @@ class CustomerType extends AbstractType
                         'message' => 'Le code postal doit comporter entre 4 et 5 chiffres.',
                     ]),
                     new NotBlank([
-                        'message' => 'Ce champ ne peut pas être vide.',
+                        'message' => self::REQUIRED_FIELD_MESSAGE,
                     ]),
                 ],
             ])
@@ -101,7 +107,7 @@ class CustomerType extends AbstractType
                 'label' => 'Ville',
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Ce champ ne peut pas être vide.',
+                        'message' => self::REQUIRED_FIELD_MESSAGE,
                     ]),
                     new Regex([
                         'pattern' => '/^(?=.*\p{L})[\p{L}0-9\s\'-]*$/u',
@@ -117,7 +123,7 @@ class CustomerType extends AbstractType
                 'label' => 'Pays',
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Ce champ ne peut pas être vide.',
+                        'message' => self::REQUIRED_FIELD_MESSAGE,
                     ]),
                 ],
                 'empty_data' => 'FR',
@@ -148,7 +154,9 @@ class CustomerType extends AbstractType
 
                             if ($isPartner && empty($partner)) {
                                 $context
-                                    ->buildViolation('Vous devez sélectionner un partenaire.')
+                                    ->buildViolation(
+                                        'Vous devez sélectionner un partenaire.'
+                                    )
                                     ->atPath('partner')
                                     ->addViolation();
                             }
@@ -171,26 +179,7 @@ class CustomerType extends AbstractType
             ])
             ->addEventListener(
                 FormEvents::PRE_SUBMIT,
-                static function (FormEvent $event): void {
-                    $data = $event->getData();
-
-                    if (!is_array($data)) {
-                        return;
-                    }
-
-                    $isPartner = $data['isPartner'] ?? false;
-                    $isProfessional = $data['isProfessional'] ?? false;
-
-                    if (!$isPartner) {
-                        $data['partner'] = null;
-                    }
-
-                    if (!$isProfessional) {
-                        $data['siret'] = null;
-                    }
-
-                    $event->setData($data);
-                }
+                self::handlePreSubmit(...)
             );
     }
 
@@ -199,5 +188,27 @@ class CustomerType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Customer::class,
         ]);
+    }
+
+    private static function handlePreSubmit(FormEvent $event): void
+    {
+        $data = $event->getData();
+
+        if (!is_array($data)) {
+            return;
+        }
+
+        $isPartner = $data['isPartner'] ?? false;
+        $isProfessional = $data['isProfessional'] ?? false;
+
+        if (!$isPartner) {
+            $data['partner'] = null;
+        }
+
+        if (!$isProfessional) {
+            $data['siret'] = null;
+        }
+
+        $event->setData($data);
     }
 }
