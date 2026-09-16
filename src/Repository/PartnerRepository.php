@@ -51,14 +51,4 @@ class PartnerRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
-
-    //    public function findOneBySomeField($value): ?Partner
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }
