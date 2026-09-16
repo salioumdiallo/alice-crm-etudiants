@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\Customer;
 use App\Entity\DynamicContent;
 use App\Form\DynamicContentType;
-use Doctrine\Persistence\ManagerRegistry as PersistenceManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/admin')]
-class AdminMainController extends AbstractController
+class DynamicContentController extends AbstractController
 {
     #[Route(
         '/contenu-dynamique/modifier/{id}/{slug}/{name}/',
@@ -21,25 +21,22 @@ class AdminMainController extends AbstractController
         requirements: ['name' => '[a-z0-9_-]{2,50}']
     )]
     public function dynamicContentEdit(
-        $name,
-        PersistenceManagerRegistry $doctrine,
+        string $name,
+        ManagerRegistry $doctrine,
         Request $request,
         #[MapEntity(mapping: ['id' => 'id', 'slug' => 'slug'])] Customer $customer
     ): Response {
-        $dynamicContentRepo = $doctrine->getRepository(
-            DynamicContent::class
-        );
+        $dynamicContentRepository = $doctrine->getRepository(DynamicContent::class);
 
-        $currentDynamicContent = $dynamicContentRepo->findOneByName(
-            $name
-        );
+        $currentDynamicContent = $dynamicContentRepository->findOneByName($name);
 
-        $em = $doctrine->getManager();
+        $entityManager = $doctrine->getManager();
 
-        if (empty($currentDynamicContent)) {
+        if (null === $currentDynamicContent) {
             $currentDynamicContent = new DynamicContent();
             $currentDynamicContent->setName($name);
-            $em->persist($currentDynamicContent);
+
+            $entityManager->persist($currentDynamicContent);
         }
 
         $form = $this->createForm(
@@ -50,7 +47,7 @@ class AdminMainController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em->flush();
+            $entityManager->flush();
 
             $this->addFlash(
                 'success',
