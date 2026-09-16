@@ -6,10 +6,13 @@
     <div class="d-flex align-items-center justify-content-between mb-3">
         <h1>Document</h1>
 
-        <div class="button-go-back" alt="Retour page précédente" onclick="window.location.href='{{ path('app_document_list') }}';">
+        <div
+            class="button-go-back"
+            alt="Retour page précédente"
+            onclick="window.location.href='{{ path('app_document_list') }}';"
+        >
             <i class="fa-sharp fa-solid fa-circle-chevron-left fa-2xl"></i>
         </div>
-
     </div>
 
     <div class="table-responsive">
@@ -17,33 +20,45 @@
             <thead>
                 <tr>
                     <th>Nom</th>
+
                     <th>
                         <div class="d-flex justify-content-between align-items-center">
                             Description
+
                             {% if document.description|length > 100 %}
-                                <span class="d-inline-block span-info-document-description btn-fa-action-eye" data-bs-toggle="tooltip" data-bs-title="Description complète : Afficher / Cacher">
+                                <span
+                                    class="d-inline-block span-info-document-description btn-fa-action-eye"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-title="Description complète : Afficher / Cacher"
+                                >
                                     <i class="fa-solid fa-eye fa-xl button-eye-document-description"></i>
                                 </span>
                             {% endif %}
                         </div>
                     </th>
+
                     <th>Date</th>
                     <th>Famille</th>
+
                     {% if isAuthorized %}
                         <th>Utilisateurs autorisés</th>
                     {% endif %}
+
                     <th>Actions</th>
                 </tr>
             </thead>
+
             <tbody>
                 <tr>
                     <td>{{ document.name }}</td>
-                    <td style="width:30%;">
+
+                    <td style="width: 30%;">
                         <div class="document-description">
                             {% if document.description|length > 100 %}
                                 <div class="document-description-slice">
                                     {{ document.description|slice(0, 100) ~ ' ...' }}
                                 </div>
+
                                 <div class="document-description-complete">
                                     {{ document.description }}
                                 </div>
@@ -53,36 +68,64 @@
                         </div>
                     </td>
 
-                    <td>{{ document.date ? document.date|date('d/m/Y') : '' }}</td>
-                    <td>{{ document.family }}</td>
-                    {% if isAuthorized %}
                     <td>
-                        <div>
-                            {% for userElement in document.user.toArray() %}
-                                <div class="form-check">
-                                    <input  class="form-check-input" 
-                                            disabled type="checkbox" 
-                                            id="user_{{ userElement.id }}" 
-                                            name="document[user][]" 
-                                            value="{{ userElement.id }}" {% if document.user.contains(userElement) %}checked{% endif %}>
-                                    
-                                    <label  class="form-check-label" 
-                                    for="user_{{ userElement.id }}">
-                                    {{ userElement.firstname|capitalize }} {{ userElement.lastname|upper }} {% if userElement.role %} | {{ userElement.role|upper }} {% endif %}
-                                    </label>
-                                </div>
-                            {% endfor %}
-                        </div>
+                        {{ document.date ? document.date|date('d/m/Y') : '' }}
                     </td>
+
+                    <td>
+                        {{ document.family }}
+                    </td>
+
+                    {% if isAuthorized %}
+                        <td>
+                            <div>
+                                {% for userElement in document.user.toArray() %}
+                                    <div class="form-check">
+                                        <input
+                                            class="form-check-input"
+                                            disabled
+                                            type="checkbox"
+                                            id="user_{{ userElement.id }}"
+                                            name="document[user][]"
+                                            value="{{ userElement.id }}"
+                                            {% if document.user.contains(userElement) %}checked{% endif %}
+                                        >
+
+                                        <label
+                                            class="form-check-label"
+                                            for="user_{{ userElement.id }}"
+                                        >
+                                            {{ userElement.firstname|capitalize }}
+                                            {{ userElement.lastname|upper }}
+
+                                            {% if userElement.status %}
+                                                | {{ userElement.status|upper }}
+                                            {% endif %}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </td>
                     {% endif %}
+
                     <td>
                         <div class="d-flex justify-content-around">
                             {% if isAuthorized %}
-                                <a href="{{ path('app_document_edit', {'id': document.id}) }}" class="btn-fa-action-list mx-1"><i class="fa-solid fa-pen-to-square fa-xl"></i></a>
+                                <a
+                                    href="{{ path('app_document_edit', {'id': document.id}) }}"
+                                    class="btn-fa-action-list mx-1"
+                                >
+                                    <i class="fa-solid fa-pen-to-square fa-xl"></i>
+                                </a>
                             {% endif %}
 
-                            <a href="{{ path('app_document_file', {'id': document.id}) }}" download class="btn-fa-action-list mx-1">
-                            <i class="fa-solid fa-download fa-xl"></i></a>
+                            <a
+                                href="{{ path('app_document_file', {'id': document.id}) }}"
+                                download
+                                class="btn-fa-action-list mx-1"
+                            >
+                                <i class="fa-solid fa-download fa-xl"></i>
+                            </a>
 
                             {% if isAuthorized %}
                                 {{ include('document/_delete_form.html.twig') }}
@@ -94,13 +137,21 @@
         </table>
     </div>
 
-
     <div class="embed-container ms-lg-5">
         {% if document.fileName|lower ends with('.pdf') %}
-            <embed src="{{ path('app_document_file', {'id': document.id}) }}" type='application/pdf' alt="{{ document.name }}" width="300" height="1000">
+            <embed
+                src="{{ path('app_document_file', {'id': document.id}) }}"
+                type="application/pdf"
+                alt="{{ document.name }}"
+                width="300"
+                height="1000"
+            >
         {% else %}
-            <img src="{{ path('app_document_file', {'id': document.id}) }}" alt="{{ document.name }}" class="img-embed-document">
+            <img
+                src="{{ path('app_document_file', {'id': document.id}) }}"
+                alt="{{ document.name }}"
+                class="img-embed-document"
+            >
         {% endif %}
     </div>
-
 {% endblock %}

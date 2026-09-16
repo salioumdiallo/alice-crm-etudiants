@@ -5,95 +5,140 @@
 {% block body %}
     <div class="d-flex align-items-center justify-content-between mb-3 mb-md-5">
         <h1>Documents</h1>
-                <div class="button-go-back" alt="Retour page précédente" onclick="window.history.back();">
+
+        <div
+            class="button-go-back"
+            alt="Retour page précédente"
+            onclick="window.history.back();"
+        >
             <i class="fa-sharp fa-solid fa-circle-chevron-left fa-2xl"></i>
         </div>
     </div>
 
     <div class="d-flex justify-content-center justify-content-lg-end mb-md-1">
-        <a href="{{ path('app_document_new') }}" class="btn-fa-action-head-page"><i class="fa-solid fa-file-circle-plus fa-xl"></i></a>
+        <a
+            href="{{ path('app_document_new') }}"
+            class="btn-fa-action-head-page"
+        >
+            <i class="fa-solid fa-file-circle-plus fa-xl"></i>
+        </a>
     </div>
-
 
     <table class="table">
         <thead>
-
             <tr>
-                {# sorting of properties based on query components #}
-                {% if app.user.roles[0] == "ROLE_ADMIN" %}
+                {# Sorting of properties based on query components #}
+
+                {% if app.user.roles[0] == 'ROLE_ADMIN' %}
                     <th class="d-none d-sm-table-cell">Utilisateur</th>
-                {% else %}
                 {% endif %}
 
-                <th {% if pagination.isSorted('d.name') %} class="sorted"{% endif %}>
-                {{ knp_pagination_sortable(pagination, 'Titre', 'd.name') }}
-                </th>
-                
-                <th class="d-none d-sm-table-cell">Description</th>
-                
-                <th>
-                {{ knp_pagination_sortable(pagination, 'Date', 'd.date') }}
+                <th {% if pagination.isSorted('d.name') %}class="sorted"{% endif %}>
+                    {{ knp_pagination_sortable(pagination, 'Titre', 'd.name') }}
                 </th>
 
-                <th {% if pagination.isSorted('d.family') %} class="sorted"{% endif %}>
-                {{ knp_pagination_sortable(pagination, 'Famille', 'd.family') }}
+                <th class="d-none d-sm-table-cell">
+                    Description
+                </th>
+
+                <th>
+                    {{ knp_pagination_sortable(pagination, 'Date', 'd.date') }}
+                </th>
+
+                <th {% if pagination.isSorted('d.family') %}class="sorted"{% endif %}>
+                    {{ knp_pagination_sortable(pagination, 'Famille', 'd.family') }}
                 </th>
 
                 <th>Actions</th>
             </tr>
-
         </thead>
+
         <tbody>
-        {% for document in pagination %}
-            <tr>
-                {% if app.user.roles[0] == "ROLE_ADMIN" %}
+            {% for document in pagination %}
+                <tr>
+                    {% if app.user.roles[0] == 'ROLE_ADMIN' %}
+                        <td class="d-none d-sm-table-cell">
+                            <div>
+                                {% for userElement in document.user.toArray() %}
+                                    <div class="form-check">
+                                        <input
+                                            class="form-check-input"
+                                            disabled
+                                            type="checkbox"
+                                            id="user_{{ userElement.id }}"
+                                            name="document[user][]"
+                                            value="{{ userElement.id }}"
+                                            {% if document.user.contains(userElement) %}checked{% endif %}
+                                        >
+
+                                        <label
+                                            class="form-check-label"
+                                            for="user_{{ userElement.id }}"
+                                        >
+                                            {{ userElement.firstname|capitalize }}
+                                            {{ userElement.lastname|upper }}
+
+                                            {% if userElement.status %}
+                                                | {{ userElement.status|upper }}
+                                            {% endif %}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </td>
+                    {% endif %}
+
+                    <td>
+                        {{ document.name }}
+                    </td>
+
                     <td class="d-none d-sm-table-cell">
-                        <div>
-                            {% for userElement in document.user.toArray() %}
-                                <div class="form-check">
-                                    <input class="form-check-input" disabled type="checkbox" id="user_{{ userElement.id }}" name="document[user][]" value="{{ userElement.id }}" {% if document.user.contains(userElement) %}checked{% endif %}>
-                                    <label class="form-check-label" for="user_{{ userElement.id }}">
-                                    {{ userElement.firstname|capitalize }} {{ userElement.lastname|upper }} {% if userElement.role %} | {{ userElement.role|upper }} {% endif %}
-                                    </label>
-                                </div>
-                            {% endfor %}
+                        {% if document.description|length > 40 %}
+                            {{ document.description|slice(0, 40) ~ '...' }}
+                        {% else %}
+                            {{ document.description }}
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {{ document.date ? document.date|date('d/m/Y') : '' }}
+                    </td>
+
+                    <td>
+                        {{ document.family }}
+                    </td>
+
+                    <td>
+                        <div class="d-flex">
+                            <a
+                                href="{{ path('app_document_show', {'id': document.id}) }}"
+                                class="btn-fa-action-eye m-0 mx-2"
+                            >
+                                <i class="fa-solid fa-eye fa-xl"></i>
+                            </a>
+
+                            <a
+                                href="{{ path('app_document_file', {'id': document.id}) }}"
+                                class="button-download m-0 mx-2"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                download
+                            >
+                                <i class="fa-solid fa-download fa-xl"></i>
+                            </a>
                         </div>
                     </td>
-                {% endif %}
-                <td>{{ document.name }}</td>
-                <td class="d-none d-sm-table-cell">
-                    {% if document.description|length > 40 %}
-                        {{ document.description|slice(0, 40) ~ '...' }}
-                    {% else %}
-                        {{ document.description }}
-                    {% endif %}
-                </td>
-
-                <td>{{ document.date ? document.date|date('d/m/Y') : '' }}</td>
-                <td>{{ document.family }}</td>
-                <td>
-                    <div class="d-flex ">
-                        <a href="{{ path('app_document_show', {'id': document.id}) }}" class="btn-fa-action-eye m-0 mx-2"><i class="fa-solid fa-eye fa-xl"></i></a>
-
-                        <a href="{{ path('app_document_file', {'id': document.id}) }}" class="button-download m-0 mx-2" target="_blank" rel="noopener noreferrer" download>
-                            <i class="fa-solid fa-download fa-xl"></i>
-                        </a>
-
-                    </div>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="7">Aucun document</td>
-            </tr>
-        {% endfor %}
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="7">Aucun document</td>
+                </tr>
+            {% endfor %}
         </tbody>
     </table>
 
-    <!-- afficher les liens de pagination -->
+    {# Afficher les liens de pagination #}
     <div>
         {{ knp_pagination_render(pagination) }}
     </div>
-
-
 {% endblock %}

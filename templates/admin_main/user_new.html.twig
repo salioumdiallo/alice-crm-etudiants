@@ -1,20 +1,24 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Créer un utilisateur | Alice CRM{% endblock %}
+
 {% form_theme form 'bootstrap_5_layout.html.twig' %}
 
 {% block body %}
     <div class="d-flex align-items-center justify-content-between mb-3">
-        <h1>Création d'un utlisateur</h1>
-        <div class="button-go-back" alt="Retour page précédente" onclick="window.history.back();">
+        <h1>Création d'un utilisateur</h1>
+
+        <div
+            class="button-go-back"
+            alt="Retour page précédente"
+            onclick="window.history.back();"
+        >
             <i class="fa-sharp fa-solid fa-circle-chevron-left fa-2xl"></i>
         </div>
     </div>
 
-
-<div class="form mt-3 mt-lg-0">
-
-    {{ form_start(form) }}
+    <div class="form mt-3 mt-lg-0">
+        {{ form_start(form) }}
 
         {{ form_errors(form) }}
 
@@ -22,14 +26,9 @@
         {{ form_row(form.lastname) }}
         {{ form_row(form.email) }}
         {{ form_row(form.password) }}
-        {{ form_row(form.role) }}
-        
-            {{ form_row(form.submit) }}
-        
+        {{ form_row(form.status) }}
+        {{ form_row(form.submit) }}
 
-
-    {{ form_end(form) }}
-
-</div>
-
+        {{ form_end(form) }}
+    </div>
 {% endblock %}
