@@ -15,9 +15,9 @@ class ContactFixtures extends Fixture
         $phoneNumberUtil = PhoneNumberUtil::getInstance();
         $phoneNumber = $phoneNumberUtil->parse('+33658745896', 'FR');
 
-        $user = $this->getReference('user');
+        $user = $this->getReference('user', User::class);
 
-        
+
         // $product = new Product();
         $contact = new Contact();
         $contact->setFirstname('Elena')

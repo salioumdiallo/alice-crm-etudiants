@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Doctrine\Persistence\ManagerRegistry as PersistenceManagerRegistry;
 
 
@@ -76,10 +76,10 @@ class ContractController extends AbstractController
 
         $serpResultForm = $this->createForm(SerpResultType::class);
         $serpResultForm->handleRequest($request);
-    
+
         if ($serpResultForm->isSubmitted() && $serpResultForm->isValid()) {
             $newSerpResults = [];
-    
+
             foreach ($serpInfos as $serpInfo) {
                 $newSerpResult = new SerpResult();
                 $keyword = $serpInfo->getKeyword();
@@ -87,7 +87,7 @@ class ContractController extends AbstractController
                 $response = HttpClient::create()->request('GET', $url);
                 $content = json_decode($response->getContent());
                 $newRank = null;
-    
+
                 if (isset($content->items)) {
                     foreach ($content->items as $index => $item) {
                         if (stripos($item->link, $contract->getWebsiteLink()) !== false) {
@@ -96,33 +96,33 @@ class ContractController extends AbstractController
                         }
                     }
                 }
-    
+
                 if ($newRank) {
                     $newSerpResult->setGoogleRank($newRank);
                     $newSerpResult->setSerpInfo($serpInfo);
                     $newSerpResult->setDate(new \DateTime());
-    
+
                     $newSerpResults[] = $newSerpResult;
                 }
             }
-    
+
             if (!empty($newSerpResults)) {
                 $em = $doctrine->getManager();
-    
+
                 foreach ($newSerpResults as $newSerpResult) {
                     $em->persist($newSerpResult);
                 }
-    
+
                 $em->flush();
-    
+
                 $this->addFlash('success', 'Rangs enregistrés avec succès');
             } else {
                 $this->addFlash('error', 'Le site n\'a pas été trouvé dans les résultats de recherche Google pour aucun des mots-clés.');
             }
-    
+
             return $this->redirectToRoute('app_contract_show', ['id' => $id]);
         }
-        
+
         return $this->render('admin_main/contract_show.html.twig', [
             'serpInfoForm' => $serpInfoForm->createView(),
             'contract' => $contract,
@@ -233,9 +233,13 @@ class ContractController extends AbstractController
 
     }
 
-    #[Route('/{id}/supprimer-serp-info/{serpInfoId}', name: 'app_serp_info_remove', methods: ['POST'])]
-    #[ParamConverter('serpInfo', options: ['id' => 'serpInfoId'])]
-    public function removeSerpInfo(SerpInfo $serpInfo, Request $request, EntityManagerInterface $entityManager, PersistenceManagerRegistry $doctrine): Response
+   #[Route('/{id}/supprimer-serp-info/{serpInfoId}', name: 'app_serp_info_remove', methods: ['POST'])]
+   public function removeSerpInfo(
+       #[MapEntity(id: 'serpInfoId')] SerpInfo $serpInfo,
+       Request $request,
+       EntityManagerInterface $entityManager,
+       PersistenceManagerRegistry $doctrine
+   ): Response
     {
 
         $contract = $serpInfo->getContract();

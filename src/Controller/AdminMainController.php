@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Doctrine\Persistence\ManagerRegistry as PersistenceManagerRegistry;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -62,8 +62,10 @@ class AdminMainController extends AbstractController
     }
 
     #[Route('/utilisateur/{id}/{slug}', name: 'app_user_show')]
-    #[ParamConverter('user', options: ['mapping' => ['id' => 'id', 'slug' => 'slug']])]
-    public function showUser(User $id, string $slug): Response
+    public function showUser(
+        #[MapEntity(mapping: ['id' => 'id', 'slug' => 'slug'])] User $id,
+        string $slug
+    ): Response
     {
         $user = $this->userRepository->findOneById($id);
 
@@ -145,8 +147,13 @@ class AdminMainController extends AbstractController
     }
 
     #[Route('/utilisateur/{id}/{slug}/modifier', name: 'app_user_edit')]
-    #[ParamConverter('user', options: ['mapping' => ['id' => 'id', 'slug' => 'slug']])]
-    public function editUser(Request $request, $id, $slug, PersistenceManagerRegistry $doctrine, User $user): Response
+   public function editUser(
+       Request $request,
+       $id,
+       $slug,
+       PersistenceManagerRegistry $doctrine,
+       #[MapEntity(mapping: ['id' => 'id', 'slug' => 'slug'])] User $user
+   ): Response
     {
         if (!$user) {
             $this->addFlash(
@@ -155,7 +162,7 @@ class AdminMainController extends AbstractController
             );
             return $this->redirectToRoute('app_user_list');
         }
-        
+
 
         $form = $this->createForm(EditUserType::class, $user);
         $form->handleRequest($request);
@@ -205,8 +212,11 @@ class AdminMainController extends AbstractController
     }
 
     #[Route('/client/{id}/{slug}', name: 'app_customer')]
-    #[ParamConverter('customer', options: ['mapping' => ['id' => 'id', 'slug' => 'slug']])]
-    public function showCustomer(Customer $id, String $slug, Request $request): Response
+    public function showCustomer(
+        #[MapEntity(mapping: ['id' => 'id', 'slug' => 'slug'])] Customer $id,
+        string $slug,
+        Request $request
+    ): Response
     {
         // recover customer object
         $customer = $this->customerRepository->findOneById($id);
@@ -214,7 +224,7 @@ class AdminMainController extends AbstractController
         if(!$customer) { // redirect to app_customer_list (customer list) if dont find customer Id
             return $this->redirectToRoute('app_customer_list', [], 301);
         }
-        
+
         // check that slug in URL match to $customer->getSlug()
         if ($customer->getSlug() !== $slug) {
             // if different = redirect to list of customer
@@ -222,7 +232,7 @@ class AdminMainController extends AbstractController
                 'alert',
                 'Vous ne pouvez pas faire ça !'
             );
-            return $this->redirectToRoute('app_customer_list', [], 301); 
+            return $this->redirectToRoute('app_customer_list', [], 301);
             // use a permanent redirection (code 301) so that search engines update their indexes
         }
 
@@ -261,12 +271,16 @@ class AdminMainController extends AbstractController
     }
 
     #[Route('/client/creer-un-client/{id}/{slug}', name: 'app_customer_add')]
-    #[ParamConverter('user', options: ['mapping' => ['id' => 'id']])]
-    public function createCustomer(Request $request, EntityManagerInterface $entityManager, PersistenceManagerRegistry $doctrine, User $user): Response
+    public function createCustomer(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        PersistenceManagerRegistry $doctrine,
+        #[MapEntity(mapping: ['id' => 'id'])] User $user
+    ): Response
     {
         $user = $this->userRepository->findOneById($user);
         $tariffZone = $this->tariffZoneRepository->findAll();
-        
+
         if (!$tariffZone) {
             $this->addFlash(
                 'notice',
@@ -274,38 +288,38 @@ class AdminMainController extends AbstractController
             );
             return $this->redirectToRoute('app_tariff_zone_new');
         }
-        
+
         $customer = new Customer();
         $form = $this->createForm(CustomerType::class, $customer, [
             'user' => $user
         ]);
         $customer->setUser($user);
-        
+
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
 
             if ($form->isValid()) {
                 $customer = $form->getData();
-               
+
                 if($customer->getSiret()){
                     // remove spaces
                     $siret = str_replace(' ', '', $form->get('siret')->getData());
                     // set Siret without spaces
                     $customer->setSiret($siret);
                 }
-                
+
                 // create Slug
                 $fullname = $customer->getName();
                 $slugify = new Slugify();
                 $slugify = $slugify->slugify($fullname);
                 $customer->setSlug($slugify);
 
-                // pass User object in customer object 
+                // pass User object in customer object
                 $customer->setUser($user);
 
                 $entityManager = $doctrine->getManager();
                 $entityManager->persist($customer); //persist data
-                $entityManager->flush(); // and push 
+                $entityManager->flush(); // and push
 
                 $this->addFlash(
                     'success',
@@ -313,7 +327,7 @@ class AdminMainController extends AbstractController
                 );
                 $customerId = $customer->getId();
                 return $this->redirectToRoute('app_customer', [ 'id' => $customerId, 'slug' => $slugify ]);
-            } 
+            }
         }
 
         return $this->render('admin_main/customer_new.html.twig', [
@@ -324,11 +338,9 @@ class AdminMainController extends AbstractController
         ]);
     }
 
-    
+
 
     #[Route('/client/{id}/{slug}/modifier-un-client', name: 'app_customer_edit')]
-    #[ParamConverter('customer', options: ['mapping' => ['id' => 'id']])]
-    #[ParamConverter('customer', options: ['mapping' => ['slug' => 'slug']])]
     public function editCustomer(Request $request, $id, $slug): Response
     {
 
@@ -337,7 +349,7 @@ class AdminMainController extends AbstractController
         if(!$customer) { // if customer do not exist => redirect to list
             return $this->redirectToRoute('app_customer_list', [], 301);
         }
-        
+
         // check that slug in URL match to $customer->getSlug()
         if ($customer->getSlug() !== $slug) {
             // if different => redirect to list of customer
@@ -345,10 +357,10 @@ class AdminMainController extends AbstractController
                 'alert',
                 'Vous ne pouvez pas faire ça !'
             );
-            
+
             return $this->redirectToRoute('app_customer', ['id' => $id, 'slug' => $slug], 301); // use a permanent redirection (code 301) so that search engines update their indexes
         }
-        
+
         $form = $this->createForm(EditCustomerType::class, $customer);
 
         $form->handleRequest($request);
@@ -374,11 +386,14 @@ class AdminMainController extends AbstractController
             'customer' => $customer
         ]);
     }
-    
+
     #[Route('/contenu-dynamique/modifier/{id}/{slug}/{name}/', name: 'dynamic_content_edit', requirements: ["name" => "[a-z0-9_-]{2,50}"])]
-    #[ParamConverter('customer', options: ['mapping' => ['slug' => 'slug']])]
-    #[ParamConverter('customer', options: ['mapping' => ['id' => 'id']])]
-    public function dynamicContentEdit($name, PersistenceManagerRegistry $doctrine, Request $request, Customer $customer): Response
+    public function dynamicContentEdit(
+        $name,
+        PersistenceManagerRegistry $doctrine,
+        Request $request,
+        #[MapEntity(mapping: ['id' => 'id', 'slug' => 'slug'])] Customer $customer
+    ): Response
     {
         // We will search by name (which serves as a key) the corresponding dynamic content
         $dynamicContentRepo = $doctrine->getRepository(DynamicContent::class);
