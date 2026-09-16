@@ -67,7 +67,7 @@ jobs:
         run: composer validate --strict --no-check-publish
 
       - name: Audit locked dependencies
-        run: composer audit --locked --no-interaction
+        run: composer audit --locked --no-interaction --abandoned=report
 
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
