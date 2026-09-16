@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Form;
 
 use App\Entity\User;
@@ -68,16 +70,16 @@ class NewUserType extends AbstractType
                 'constraints' => [
                     new Length([
                         'min' => 2,
-                        'minMessage' => 'Le prénom contient moins de {{ limit }} caractères.',
                         'max' => 30,
+                        'minMessage' => 'Le prénom contient moins de {{ limit }} caractères.',
                         'maxMessage' => 'Le prénom contient plus de {{ limit }} caractères.',
                     ]),
                     new NotBlank([
                         'message' => 'Veuillez renseigner un prénom.',
                     ]),
                     new Regex([
-                        'pattern' => '/^[a-zA-ZÀ-ÿ\-\s]+$/u',
-                        'message' => 'Ce champ ne peut contenir que des lettres, des espaces et des tirets.',
+                        'pattern' => '/^[\p{L}\s\'-]+$/u',
+                        'message' => 'Ce champ ne peut contenir que des lettres, des espaces, des apostrophes et des tirets.',
                     ]),
                 ],
                 'attr' => [
@@ -89,16 +91,16 @@ class NewUserType extends AbstractType
                 'constraints' => [
                     new Length([
                         'min' => 2,
-                        'minMessage' => 'Le nom contient moins de {{ limit }} caractères.',
                         'max' => 30,
+                        'minMessage' => 'Le nom contient moins de {{ limit }} caractères.',
                         'maxMessage' => 'Le nom contient plus de {{ limit }} caractères.',
                     ]),
                     new NotBlank([
                         'message' => 'Veuillez renseigner un nom.',
                     ]),
                     new Regex([
-                        'pattern' => '/^[a-zA-ZÀ-ÿ\-\s]+$/u',
-                        'message' => 'Ce champ ne peut contenir que des lettres, des espaces et des tirets.',
+                        'pattern' => '/^[\p{L}\s\'-]+$/u',
+                        'message' => 'Ce champ ne peut contenir que des lettres, des espaces, des apostrophes et des tirets.',
                     ]),
                 ],
                 'attr' => [

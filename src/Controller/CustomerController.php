@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Customer;
@@ -7,15 +9,12 @@ use App\Entity\DynamicContent;
 use App\Entity\User;
 use App\Form\CustomerType;
 use App\Form\DynamicContentType;
-use App\Form\EditCustomerType;
 use App\Repository\ContactRepository;
 use App\Repository\ContractRepository;
 use App\Repository\CustomerRepository;
 use App\Repository\TariffZoneRepository;
-use App\Repository\UserRepository;
 use Cocur\Slugify\Slugify;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry as PersistenceManagerRegistry;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,12 +25,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class CustomerController extends AbstractController
 {
     public function __construct(
-        private UserRepository $userRepository,
         private CustomerRepository $customerRepository,
         private ContactRepository $contactRepository,
         private ContractRepository $contractRepository,
         private TariffZoneRepository $tariffZoneRepository,
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -49,7 +47,7 @@ class CustomerController extends AbstractController
     public function showCustomer(
         #[MapEntity(mapping: ['id' => 'id', 'slug' => 'slug'])] Customer $customer,
         string $slug,
-        Request $request
+        Request $request,
     ): Response {
         if ($customer->getSlug() !== $slug) {
             $this->addFlash(
@@ -97,67 +95,53 @@ class CustomerController extends AbstractController
     #[Route('/client/creer-un-client/{id}/{slug}', name: 'app_customer_add')]
     public function createCustomer(
         Request $request,
-        PersistenceManagerRegistry $doctrine,
-        #[MapEntity(mapping: ['id' => 'id'])] User $user
+        #[MapEntity(mapping: ['id' => 'id'])] User $user,
     ): Response {
-        $user = $this->userRepository->findOneById($user);
-        $tariffZone = $this->tariffZoneRepository->findAll();
+        $tariffZones = $this->tariffZoneRepository->findAll();
 
-        if (!$tariffZone) {
+        if ([] === $tariffZones) {
             $this->addFlash(
                 'notice',
-                'Vous n\'avez pas encore définit de zone tarifaire. Merci de renseigner préalablement cet élément. Vous pourrez retourner sur le formulaire de création client par la suite.',
+                'Vous n\'avez pas encore défini de zone tarifaire. Merci de renseigner préalablement cet élément. Vous pourrez retourner sur le formulaire de création client par la suite.'
             );
 
             return $this->redirectToRoute('app_tariff_zone_new');
         }
 
         $customer = new Customer();
-
-        $form = $this->createForm(CustomerType::class, $customer, [
-            'user' => $user,
-        ]);
-
         $customer->setUser($user);
 
+        $form = $this->createForm(CustomerType::class, $customer);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
-            if ($form->isValid()) {
-                $customer = $form->getData();
-
-                if ($customer->getSiret()) {
-                    $siret = str_replace(
-                        ' ',
-                        '',
-                        $form->get('siret')->getData()
-                    );
-
-                    $customer->setSiret($siret);
-                }
-
-                $fullname = $customer->getName();
-
-                $slugify = new Slugify();
-                $slug = $slugify->slugify($fullname);
-
-                $customer->setSlug($slug);
-                $customer->setUser($user);
-
-                $entityManager = $doctrine->getManager();
-                $entityManager->persist($customer);
-                $entityManager->flush();
-
-                $this->addFlash(
-                    'success',
-                    'La création du client est bien enregistrée.'
+        if ($form->isSubmitted() && $form->isValid()) {
+            if ($customer->getSiret()) {
+                $siret = str_replace(
+                    ' ',
+                    '',
+                    (string) $form->get('siret')->getData()
                 );
 
-                return $this->redirectToRoute('app_customer', [
-                    'id' => $customer->getId(),
-                    'slug' => $slug,
-                ]);
+                $customer->setSiret($siret);
             }
+
+            $slugify = new Slugify();
+            $slug = $slugify->slugify($customer->getName());
+
+            $customer->setSlug($slug);
+
+            $this->entityManager->persist($customer);
+            $this->entityManager->flush();
+
+            $this->addFlash(
+                'success',
+                'La création du client est bien enregistrée.'
+            );
+
+            return $this->redirectToRoute('app_customer', [
+                'id' => $customer->getId(),
+                'slug' => $slug,
+            ]);
         }
 
         return $this->render('admin_main/customer_new.html.twig', [
@@ -172,7 +156,7 @@ class CustomerController extends AbstractController
     public function editCustomer(
         Request $request,
         int $id,
-        string $slug
+        string $slug,
     ): Response {
         $customer = $this->customerRepository->findOneById($id);
 
@@ -190,18 +174,14 @@ class CustomerController extends AbstractController
                 'Vous ne pouvez pas faire ça !'
             );
 
-            return $this->redirectToRoute(
-                'app_customer',
-                [
-                    'id' => $id,
-                    'slug' => $slug,
-                ],
-                301
-            );
+            return $this->redirectToRoute('app_customer', [
+                'id' => $customer->getId(),
+                'slug' => $customer->getSlug(),
+            ]);
         }
 
         $form = $this->createForm(
-            EditCustomerType::class,
+            CustomerType::class,
             $customer
         );
 
@@ -212,11 +192,16 @@ class CustomerController extends AbstractController
                 $siret = str_replace(
                     ' ',
                     '',
-                    $form->get('siret')->getData()
+                    (string) $form->get('siret')->getData()
                 );
 
                 $customer->setSiret($siret);
             }
+
+            $slugify = new Slugify();
+            $customer->setSlug(
+                $slugify->slugify($customer->getName())
+            );
 
             $this->entityManager->flush();
 
@@ -226,8 +211,8 @@ class CustomerController extends AbstractController
             );
 
             return $this->redirectToRoute('app_customer', [
-                'id' => $id,
-                'slug' => $slug,
+                'id' => $customer->getId(),
+                'slug' => $customer->getSlug(),
             ]);
         }
 
