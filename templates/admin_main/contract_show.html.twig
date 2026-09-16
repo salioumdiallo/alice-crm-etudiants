@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Contrat Détail | Alice CRM{% endblock %}
+{% block title %}Contrat DÃ©tail | Alice CRM{% endblock %}
 
 {% block body %}
     <div class="d-flex align-items-center justify-content-between mb-3">
         <h1>{{ contract.name }}</h1>
-        <div class="button-go-back" alt="Retour page précédente" onclick="window.history.back();">
+        <div class="button-go-back" alt="Retour page prÃ©cÃ©dente" onclick="window.history.back();">
             <i class="fa-sharp fa-solid fa-circle-chevron-left fa-2xl"></i>
         </div>
     </div>
@@ -13,7 +13,7 @@
     <div class="d-flex my-2 me-md-1 justify-content-end d-lg-flex">
 
         <a href="{{ path('app_contract_edit', { 'id': contract.id }) }}" class="btn-fa-action-head-page mx-2"><i class="fa-solid fa-pen-to-square fa-xl"></i></a>
-        <form method="post" action="{{ path('app_contract_remove', { 'id': contract.id }) }}" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce contrat ?');">
+        <form method="post" action="{{ path('app_contract_remove', { 'id': contract.id }) }}" class="d-inline" onsubmit="return confirm('ÃŠtes-vous sÃ»r de vouloir supprimer ce contrat ?');">
             <input type="hidden" name="_token" value="{{ csrf_token('delete_contract' ~ contract.id) }}">
             <button type="submit" class="btn-fa-action-head-supp mx-2 border-0 bg-transparent" aria-label="Supprimer le contrat"><i class="fa-solid fa-trash fa-xl"></i></button>
         </form>
@@ -34,7 +34,7 @@
         <tbody>
             <tr>
                 <th scope="col">Site Client</th>
-                <td><a href="{{ contract.websiteLink }}" target="_blank" id="url" class="hover-link">{{ contract.websiteLink }}</a></td>
+                <td><a href="{{ contract.websiteLink }}" target="_blank" rel="noopener noreferrer" id="url" class="hover-link">{{ contract.websiteLink }}</a></td>
             </tr>
             <tr>
                 <th scope="col">Date</th>
@@ -72,20 +72,20 @@
         </thead>
         <tbody>
             <tr>
-                <th scope="col">Éléments Facturés</th>
+                <th scope="col">Ã‰lÃ©ments FacturÃ©s</th>
                 <td>{{ contract.timeCharged }}</td>
                 <td>{{ contract.amountCharged }}</td>
             </tr>
             <tr>
-                <th scope="col">Éléments Réels</th>
+                <th scope="col">Ã‰lÃ©ments RÃ©els</th>
                 <td>{{ contract.timeReal }}</td>
                 <td>{{ contract.amountReal }}</td>
             </tr>
             <tr>
                 <th class="d-flex">
-                {# TODO : à faire en ternaire  #}
+                {# TODO : Ã  faire en ternaire  #}
                     <p class="m-0 {% if contract.timeCharged > contract.timeReal %} text-success {% else %} text-danger {% endif %}">Delta
-                    {% if contract.timeCharged > contract.timeReal %}positif{% else %}négatif{% endif %}
+                    {% if contract.timeCharged > contract.timeReal %}positif{% else %}nÃ©gatif{% endif %}
                     </p>
                 </th>
                 <th>
@@ -109,13 +109,13 @@
 {# classement web #}
 
     <div class="my-5">
-        <h3>Référencement par mots-clés</h3>
+        <h3>RÃ©fÃ©rencement par mots-clÃ©s</h3>
     </div>
         {% for serpInfo in serpInfos %}
             <div class="row keyword-container d-flex flex-row mb-2 align-items-center"
                     data-keyword="{{ serpInfo.id }}"
                    >
-                <form method="post" action="{{ path('app_serp_info_remove', { 'id': contract.id, 'serpInfoId': serpInfo.id }) }}" class="col-3 offset-1 col-md-1 offset-md-1" onsubmit="return confirm('Supprimer ce mot-clé ?');">
+                <form method="post" action="{{ path('app_serp_info_remove', { 'id': contract.id, 'serpInfoId': serpInfo.id }) }}" class="col-3 offset-1 col-md-1 offset-md-1" onsubmit="return confirm('Supprimer ce mot-clÃ© ?');">
                     <input type="hidden" name="_token" value="{{ csrf_token('delete_serp_info' ~ serpInfo.id) }}">
                     <button type="submit" class="btn btn-block btn-sm btn-outline-danger" id="btn-sup-keyword">X</button>
                 </form>
@@ -126,9 +126,9 @@
             </div>
         {% endfor %}
     <div class="row d-flex flex-row my-5 align-items-center justify-content-center">
-        <span class="btn btn-alice col-10 col-md-6 col-lg-4 add-serp-button">Ajouter un mot clé</span>
+        <span class="btn btn-alice col-10 col-md-6 col-lg-4 add-serp-button">Ajouter un mot clÃ©</span>
         <div class="serp-info-form flex-column flex-md-row justify-content-center align-items-center">
-            <span class="fs-5 mb-3 mb-md-0">Mot clé : </span>
+            <span class="fs-5 mb-3 mb-md-0">Mot clÃ© : </span>
             <div class="d-flex flex-column align-items-center flex-md-row">
                 <div class="mx-sm-3 ">
                     {{ form_start(serpInfoForm) }}
@@ -142,7 +142,7 @@
             </div>
         </div>
         <div class="d-flex flex-column justify-content-center align-items-center mb-5 px-0 mt-2">
-            <div id="serp" class="btn btn-alice-serp col-10 col-md-6 col-lg-4">Afficher les résultats</div>
+            <div id="serp" class="btn btn-alice-serp col-10 col-md-6 col-lg-4">Afficher les rÃ©sultats</div>
             <div class="col-10 col-md-6 col-lg-4 mt-2">
                 {{ form(serpResultForm) }}
             </div>

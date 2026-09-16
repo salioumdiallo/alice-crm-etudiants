@@ -19,11 +19,9 @@ use Symfony\Component\Validator\Constraints\File;
 
 class DocumentType extends AbstractType
 {
-    private $authChecker;
-
-    public function __construct(AuthorizationCheckerInterface $authChecker)
-    {
-        $this->authChecker = $authChecker;
+    public function __construct(
+        private readonly AuthorizationCheckerInterface $authChecker,
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -35,7 +33,6 @@ class DocumentType extends AbstractType
             ->add('description', TextareaType::class, [
                 'label' => 'Description',
             ])
-
             ->add('family', ChoiceType::class, [
                 'label' => 'Famille de document',
                 'required' => true,
@@ -49,17 +46,15 @@ class DocumentType extends AbstractType
                     'Autre' => 'Autre',
                 ],
             ]);
-        if (!$options['disable_file_upload']) { // went edit, for change file
-            $builder
-            ->add('fileName', FileType::class, [
+
+        if (!$options['disable_file_upload']) {
+            $builder->add('fileName', FileType::class, [
                 'label' => 'Envoyer un document',
                 'attr' => [
                     'class' => 'mb-3',
+                    'accept' => 'application/pdf,image/jpeg,image/png',
                 ],
-                // unmapped means that this field is not associated to any entity property
                 'mapped' => false,
-
-                // make it optional so you don't have to re-upload the PDF file every time you edit the file
                 'required' => false,
                 'constraints' => [
                     new File([
@@ -69,13 +64,12 @@ class DocumentType extends AbstractType
                             'image/jpeg',
                             'image/png',
                         ],
-                        'mimeTypesMessage' => 'Veuillez télécharger un fichier PDF ou image valide',
+                        'mimeTypesMessage' => 'Veuillez télécharger un fichier PDF, JPEG ou PNG valide.',
                     ]),
                 ],
             ]);
         }
 
-        // condition the display of the 'user' field according to the user's role
         if ($this->authChecker->isGranted('ROLE_ADMIN')) {
             $builder->add('user', EntityType::class, [
                 'label' => 'Pour qui ce document est-il destiné ?',
@@ -84,9 +78,8 @@ class DocumentType extends AbstractType
                 'expanded' => true,
             ]);
         } elseif ($this->authChecker->isGranted('ROLE_USER')) {
-            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
-                $form = $event->getForm();
-                $form->remove('user');
+            $builder->addEventListener(FormEvents::PRE_SET_DATA, static function (FormEvent $event): void {
+                $event->getForm()->remove('user');
             });
         }
     }
@@ -95,7 +88,7 @@ class DocumentType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Document::class,
-            'disable_file_upload' => false, // option with a default value
+            'disable_file_upload' => false,
         ]);
     }
 }

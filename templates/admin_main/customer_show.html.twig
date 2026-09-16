@@ -112,7 +112,7 @@
                         {% endfor %}
 
                     {% else %}
-                        <a href="{{ path('app_contact_add', { 'id': customer.user.id, 'slug': customer.user.slug }) }}" class="btn btn-alice mx-auto">Créer un contact</a>
+                        <a href="{{ path('app_contact_add', { 'id': customer.user.id, 'slug': customer.user.slug }) }}" class="btn btn-alice mx-auto">CrÃ©er un contact</a>
                     {% endif %}
 
 
@@ -121,13 +121,13 @@
 
             </div>
 
-                {#### Détail client  ####}
+                {#### DÃ©tail client  ####}
 
 
             <div class="col-12">
                 <div class="d-flex flex-column mt-1 border p-0">
 
-                    <h5 class="w-100 text-center m-0 bg-alice-light py-1">Détail Client</h5>
+                    <h5 class="w-100 text-center m-0 bg-alice-light py-1">DÃ©tail Client</h5>
 
                     <table class="table mb-0">
                         <tbody>
@@ -160,7 +160,7 @@
                                     <table class="table m-0 table-borderless table-sm">
                                         <tr>
                                             <td class="col-6"><strong>{{ customer.tariffZone.name|capitalize }}</strong></td>
-                                            <td class="col-6"><strong>{{ customer.tariffZone.amount }} €</strong></td>
+                                            <td class="col-6"><strong>{{ customer.tariffZone.amount }} â‚¬</strong></td>
                                         </tr>
                                     </table>
                                 </td>
@@ -308,24 +308,24 @@
                                             <td>{{ contract.date|date("m/d/Y") }}</td>
                                         </tr>
                                         <tr>
-                                            <td>Montant facturé</td>
-                                            <td>{{ contract.amountCharged }} €</td>
+                                            <td>Montant facturÃ©</td>
+                                            <td>{{ contract.amountCharged }} â‚¬</td>
                                         </tr>
                                         <tr>
-                                            <td>Temps facturé</td>
+                                            <td>Temps facturÃ©</td>
                                             <td>{{ contract.timeCharged }} heures</td>
                                         </tr>
                                         <tr>
-                                            <td>Montant réel</td>
-                                            <td>{{ contract.amountReal }} €</td>
+                                            <td>Montant rÃ©el</td>
+                                            <td>{{ contract.amountReal }} â‚¬</td>
                                         </tr>
                                         <tr>
-                                            <td>Temps réel</td>
+                                            <td>Temps rÃ©el</td>
                                             <td>{{ contract.timeReal }} heures</td>
                                         </tr>
                                         <tr>
-                                            <td>Site géré par le contrat</td>
-                                            <td><a href="{{ contract.websiteLink }}" target="_blank" class="hover-link">{{ contract.websiteLink }}</a></td>
+                                            <td>Site gÃ©rÃ© par le contrat</td>
+                                            <td><a href="{{ contract.websiteLink }}" target="_blank" rel="noopener noreferrer" class="hover-link">{{ contract.websiteLink }}</a></td>
                                         </tr>
                                         <tr>
                                             <td>Fractionnement</td>
