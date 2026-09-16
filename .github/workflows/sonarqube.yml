@@ -2,8 +2,9 @@ name: SonarQube
 
 on:
   push:
-    branches: [main]
+    branches: [main, maintenance/security-quality-2026-09-16]
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -56,6 +57,12 @@ jobs:
 
       - name: Prepare Symfony environment file
         run: cp .env.example .env
+
+      - name: Validate Composer configuration
+        run: composer validate --strict --no-check-publish
+
+      - name: Audit locked dependencies
+        run: composer audit --locked --no-interaction
 
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
