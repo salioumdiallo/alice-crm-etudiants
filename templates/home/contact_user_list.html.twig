@@ -1,25 +1,32 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mes contacts | Alice_CRM{% endblock %}
+{% block title %}Mes contacts | Alice CRM{% endblock %}
 
 {% block body %}
     <div class="d-flex align-items-center justify-content-between mb-3">
         <h1>Mes contacts</h1>
-                <div class="button-go-back" alt="Retour page précédente" onclick="window.history.back();">
+
+        <div
+            class="button-go-back"
+            role="button"
+            tabindex="0"
+            aria-label="Retour à la page précédente"
+            onclick="window.history.back();"
+        >
             <i class="fa-sharp fa-solid fa-circle-chevron-left fa-2xl"></i>
         </div>
     </div>
-    
 
-        <div class="d-flex justify-content-center justify-content-lg-end me-2">
-            <a href="{{ path('app_contact_user_add') }}" class="btn btn-alice mx-1">Nouveau contact</a>
-        </div>
-    
+    <div class="d-flex justify-content-center justify-content-lg-end me-2">
+        <a href="{{ path('app_contact_user_add') }}" class="btn btn-alice mx-1">
+            Nouveau contact
+        </a>
+    </div>
+
     {% if contacts is not empty %}
-
         <div class="table-responsive mt-5">
-
-            <table class="table table-responsive">
+            <table class="table">
+                <caption>Liste de mes contacts</caption>
 
                 <thead>
                     <tr>
@@ -32,34 +39,62 @@
                     </tr>
                 </thead>
 
-                {% for contact in contacts %}
-
-                    <tbody>
+                <tbody>
+                    {% for contact in contacts %}
                         <tr>
-                            <td>{{ contact.firstname|capitalize }} {{ contact.lastname|upper }}</td>
-                            <td>{{ contact.email }}</td>
-                            <td>{{ contact.phone|phone_number_format('INTERNATIONAL') }}</td>
-                            <td>{{ contact.position }}</td>
-            
-                            <td>{% if contact.isMain == true %}
-                                <p class="text-start m-0"><i class="fa-sharp fa-solid fa-circle-check fa-xl" style="color: #19374d;"></i></p>
-                            {% endif %}</td>
-                            <td><a href="{{ path('app_contacts_user_edit', { id: contact.id, slug: contact.slug }) }}" class="hover-link">Modifier</a></td>
-                        </tr>
-                    </tbody>
+                            <td>
+                                {{ contact.firstname|capitalize }}
+                                {{ contact.lastname|upper }}
+                            </td>
 
-                {% endfor %} 
+                            <td>{{ contact.email }}</td>
+
+                            <td>
+                                {{ contact.phone|phone_number_format('INTERNATIONAL') }}
+                            </td>
+
+                            <td>{{ contact.position }}</td>
+
+                            <td>
+                                {% if contact.isMain == true %}
+                                    <p class="text-start m-0">
+                                        <i
+                                            class="fa-sharp fa-solid fa-circle-check fa-xl"
+                                            style="color: #19374d;"
+                                            aria-label="Contact principal"
+                                        ></i>
+                                    </p>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <a
+                                    href="{{ path('app_contacts_user_edit', {'id': contact.id, 'slug': contact.slug}) }}"
+                                    class="hover-link"
+                                >
+                                    Modifier
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
             </table>
         </div>
     {% else %}
-                <h4 class="mb-5">Aucun Contacts</h4>
-                <div class="d-flex flex-column flex-md-row col-12 justify-content-around">
-                    <div class="card col-md-5 bgg-alice-light m-2">
-                        <div class="d-flex flex-column align-items-center card-body justify-content-between">
-                            <h6 class="card-title mb-2">Souhaitez-vous créer un nouveau contact ?</h6>
-                            <a href=" {{ path('app_user_add') }} " class="btn btn-alice">Nouveau contact</a>
-                        </div>
-                    </div>
+        <h4 class="mb-5">Aucun contact</h4>
+
+        <div class="d-flex flex-column flex-md-row col-12 justify-content-around">
+            <div class="card col-md-5 bgg-alice-light m-2">
+                <div class="d-flex flex-column align-items-center card-body justify-content-between">
+                    <h6 class="card-title mb-2">
+                        Souhaitez-vous créer un nouveau contact ?
+                    </h6>
+
+                    <a href="{{ path('app_contact_user_add') }}" class="btn btn-alice">
+                        Nouveau contact
+                    </a>
                 </div>
+            </div>
+        </div>
     {% endif %}
 {% endblock %}

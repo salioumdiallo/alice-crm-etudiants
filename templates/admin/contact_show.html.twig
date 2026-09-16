@@ -3,10 +3,16 @@
 {% block title %}Contact {{ contact.firstname|capitalize }} {{ contact.lastname|upper }} | Alice CRM{% endblock %}
 
 {% block body %}
-
     <div class="d-flex align-items-center justify-content-between mb-3">
         <h1>Détail Fiche Contact</h1>
-        <div class="button-go-back" alt="Retour page précédente" onclick="window.history.back();">
+
+        <div
+            class="button-go-back"
+            role="button"
+            tabindex="0"
+            aria-label="Retour à la page précédente"
+            onclick="window.history.back();"
+        >
             <i class="fa-sharp fa-solid fa-circle-chevron-left fa-2xl"></i>
         </div>
     </div>
@@ -14,63 +20,95 @@
     <div class="d-flex flex-column justify-content-around">
         {% if customer is not null %}
             <div class="d-flex flex-column">
-                <p class="fs-6">Nom du client : </p>
-                <p class="fs-5 fw-medium"><a href="{{ path('app_customer', {'id': user.customer.id, 'slug': user.customer.slug }) }}" class="hover-link">{{ user.customer.name|upper }}</a></p>
+                <p class="fs-6">Nom du client :</p>
+
+                <p class="fs-5 fw-medium">
+                    <a
+                        href="{{ path('app_customer', {'id': user.customer.id, 'slug': user.customer.slug}) }}"
+                        class="hover-link"
+                    >
+                        {{ user.customer.name|upper }}
+                    </a>
+                </p>
             </div>
         {% endif %}
 
-            <div class="d-flex flex-column">
-                <p class="fs-6">Non Utilisateur :  </p>
-                <p class="fs-5 fw-medium"><a href="{{ path('app_user_show', { 'id': user.id, 'slug': user.slug }) }}" class="hover-link">{{ contact.user.firstname }} {{ contact.user.lastname }}</a></p>
-            </div>
+        <div class="d-flex flex-column">
+            <p class="fs-6">Nom utilisateur :</p>
+
+            <p class="fs-5 fw-medium">
+                <a
+                    href="{{ path('app_user_show', {'id': user.id, 'slug': user.slug}) }}"
+                    class="hover-link"
+                >
+                    {{ contact.user.firstname }} {{ contact.user.lastname }}
+                </a>
+            </p>
+        </div>
     </div>
 
     <div class="d-flex flex-column align-items-center flex-sm-row flex-sm-wrap mb-3 me-md-1 justify-content-center justify-content-lg-end">
-        <a href="{{ path('app_contact_edit', { 'id': contact.id, 'slug': contact.slug }) }}" class="btn btn-alice btn-block mx-3">Modifier</a>        
+        <a
+            href="{{ path('app_contact_edit', {'id': contact.id, 'slug': contact.slug}) }}"
+            class="btn btn-alice btn-block mx-3"
+        >
+            Modifier
+        </a>
 
-        <form method="post" action="{{ path('app_contact_delete', { 'id': contact.id, 'slug': contact.slug }) }}" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce contact ?');">
-            <input type="hidden" name="_token" value="{{ csrf_token('delete_contact' ~ contact.id) }}">
-            <button type="submit" class="btn btn-alice-supp mx-3">Supprimer</button>
+        <form
+            method="post"
+            action="{{ path('app_contact_delete', {'id': contact.id, 'slug': contact.slug}) }}"
+            class="d-inline"
+            onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce contact ?');"
+        >
+            <input
+                type="hidden"
+                name="_token"
+                value="{{ csrf_token('delete_contact' ~ contact.id) }}"
+            >
+
+            <button type="submit" class="btn btn-alice-supp mx-3">
+                Supprimer
+            </button>
         </form>
-
     </div>
 
     <div class="table-responsive me-lg-5">
-
-
-            
         <table class="table">
+            <caption>Détails du contact</caption>
 
-                <thead>
-                    <tr>
-                        <th scope="col">Nom</th>
-                        <th scope="col">Prénom</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Téléphone</th>
-                        <th scope="col">Fonction</th>
-                        {% if contact.isMain == 1 %}
-                            <th scope="col">Contact Principal</th>
-                        {% endif %}
-                    </tr>
-                </thead>
+            <thead>
+                <tr>
+                    <th scope="col">Nom</th>
+                    <th scope="col">Prénom</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Téléphone</th>
+                    <th scope="col">Fonction</th>
 
-                <tbody>
-                    <tr>
-                        <td>{{ contact.lastname|upper }}</td>
-                        <td>{{ contact.firstname|capitalize }}</td>
-                        <td>{{ contact.email }}</td>
-                        <td>{{ contact.phone|phone_number_format('INTERNATIONAL') }}</td>
-                        <td>{{ contact.position|upper }}</td>
-                        {% if contact.isMain == 1 %}
-                            <td><img src=" {{ asset('/assets/img/Check.png') }} " alt="Check"></td>
-                        {% endif %}
-                    </tr>
+                    {% if contact.isMain == 1 %}
+                        <th scope="col">Contact principal</th>
+                    {% endif %}
+                </tr>
+            </thead>
 
-                </tbody>
+            <tbody>
+                <tr>
+                    <td>{{ contact.lastname|upper }}</td>
+                    <td>{{ contact.firstname|capitalize }}</td>
+                    <td>{{ contact.email }}</td>
+                    <td>{{ contact.phone|phone_number_format('INTERNATIONAL') }}</td>
+                    <td>{{ contact.position|upper }}</td>
 
+                    {% if contact.isMain == 1 %}
+                        <td>
+                            <img
+                                src="{{ asset('/assets/img/Check.png') }}"
+                                alt="Contact principal"
+                            >
+                        </td>
+                    {% endif %}
+                </tr>
+            </tbody>
         </table>
-
     </div>
-
-
 {% endblock %}

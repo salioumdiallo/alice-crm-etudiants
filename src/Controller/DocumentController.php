@@ -2,22 +2,21 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
 use App\Entity\Document;
+use App\Entity\User;
 use App\Form\DocumentType;
 use App\Repository\DocumentRepository;
 use App\Security\DocumentVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/document')]
 class DocumentController extends AbstractController
@@ -30,18 +29,17 @@ class DocumentController extends AbstractController
         $this->entityManager = $entityManager;
         $this->documentRepository = $documentRepository;
     }
-    
+
     #[Route('/', name: 'app_document_list', methods: ['GET'])]
     public function index(PaginatorInterface $paginator, Request $request): Response
     {
         $user = $this->getUser();
-        
+
         if ($this->isGranted('ROLE_ADMIN')) {
             // If the user is an admin, display all documents
             $query = $this->entityManager->getRepository(Document::class)
                 ->createQueryBuilder('d')
                 ->leftJoin('d.user', 'u');
-
         } else {
             // Otherwise, display only the documents of the logged-in user
             $query = $this->entityManager
@@ -52,15 +50,14 @@ class DocumentController extends AbstractController
                 ->setParameter('user_id', $user->getId())
                 ->orderBy('d.date', 'DESC');
         }
-    
-        // 
+
         $pagination = $paginator->paginate(
             $query, /* query builder containing the data to paginate */
             $request->query->getInt('page', 1), /* default page number */
             10, /* number of elements per page */
             ['defaultSortFieldName' => 'd.date', 'defaultSortDirection' => 'desc']
         );
-        
+
         return $this->render('document/list.html.twig', [
             'pagination' => $pagination,
         ]);
@@ -70,7 +67,7 @@ class DocumentController extends AbstractController
     public function new(Request $request, SluggerInterface $slugger, EntityManagerInterface $entityManager): Response
     {
         $document = new Document();
-        
+
         if ($this->isGranted('ROLE_ADMIN')) {
             $adminUser = [$this->getUser()];
         } else {
@@ -83,9 +80,9 @@ class DocumentController extends AbstractController
                 ->getQuery()
                 ->getResult();
         }
-        
+
         $users = array_merge([$this->getUser()], $adminUser);
-        
+
         foreach ($users as $user) {
             $document->addUser($user);
         }
@@ -94,13 +91,12 @@ class DocumentController extends AbstractController
         $form = $this->createForm(DocumentType::class, $document);
 
         $form->handleRequest($request);
-        
+
         if ($form->isSubmitted() && $form->isValid()) {
-            
             $file = $form->get('fileName')->getData();
-            
+
             if ($file) {
-                //needed to get the original file name of the downloaded file without the extension
+                // needed to get the original file name of the downloaded file without the extension
                 $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
                 // this is needed to safely include the file name as part of the URL
                 $safeFilename = $slugger->slug($originalFilename);
@@ -127,9 +123,10 @@ class DocumentController extends AbstractController
             }
             $this->documentRepository->save($document, true);
             $this->addFlash(
-               'success',
-               'Le document est bien enregistré.'
+                'success',
+                'Le document est bien enregistré.'
             );
+
             return $this->redirectToRoute('app_document_show', ['id' => $document->getId()], Response::HTTP_SEE_OTHER);
         }
 
@@ -146,7 +143,7 @@ class DocumentController extends AbstractController
 
         $isAuthorized = $authChecker->isGranted('ROLE_ADMIN');
         $authorizedUsers = $document->getUser()->toArray();
-    
+
         return $this->render('document/show.html.twig', [
             'document' => $document,
             'isAuthorized' => $isAuthorized,
@@ -182,20 +179,17 @@ class DocumentController extends AbstractController
         $isAuthorized = $authChecker->isGranted('ROLE_ADMIN');
 
         if ($this->isGranted('ROLE_ADMIN')) {
-
             $form = $this->createForm(DocumentType::class, $document, [
-                'disable_file_upload' => true, //option to disable the file field
+                'disable_file_upload' => true, // option to disable the file field
             ]);
             $form->handleRequest($request);
-            
+
             if ($form->isSubmitted() && $form->isValid()) {
-                        
                 $this->documentRepository->save($document, true);
+
                 return $this->redirectToRoute('app_document_show', ['id' => $document->getId()], Response::HTTP_SEE_OTHER);
             }
-
         }
-        
 
         return $this->render('document/edit.html.twig', [
             'document' => $document,

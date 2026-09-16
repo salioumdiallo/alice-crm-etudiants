@@ -24,26 +24,24 @@ class SerpResultController extends AbstractController
     #[Route('/new', name: 'app_serp_result_new', methods: ['POST'])]
     public function save(Request $request, SerpResultRepository $serpResultRepository): Response
     {
-        
         $serpResult = new SerpResult();
         $form = $this->createForm(SerpResultType::class, $serpResult);
         $form->handleRequest($request);
-    
+
         // Add code to handle the JSON data sent by the JavaScript function
         $data = json_decode($request->getContent(), true);
-        
+
         if (isset($data['keyword']) && isset($data['rank'])) {
             $serpResult->setSerpInfo($data['keyword']);
             $serpResult->setGoogleRank($data['rank']);
             $serpResultRepository->save($serpResult, true);
         }
-    
+
         return $this->render('serp_result/new.html.twig', [
             'serp_result' => $serpResult,
             'form' => $form,
         ]);
     }
-    
 
     #[Route('/{id}', name: 'app_serp_result_show', methods: ['GET'])]
     public function show(SerpResult $serpResult): Response

@@ -1,27 +1,34 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Créer un contact | Alice CRM{% endblock %}
+
 {% form_theme form 'bootstrap_5_layout.html.twig' %}
 
 {% block body %}
     <div class="d-flex align-items-center justify-content-between mb-3">
         <h1>Création d'un contact</h1>
-        <div class="button-go-back" alt="Retour page précédente" onclick="window.history.back();">
+
+        <div
+            class="button-go-back"
+            alt="Retour page précédente"
+            onclick="window.history.back();"
+        >
             <i class="fa-sharp fa-solid fa-circle-chevron-left fa-2xl"></i>
         </div>
     </div>
 
-<h4>Pour l'utilisateur : {{ user.firstname }} {{ user.lastname }}</h4>
+    <h4>
+        Pour l'utilisateur : {{ user.firstname }} {{ user.lastname }}
+    </h4>
 
     {% if user.customer is empty %}
-    <p>Statut : {{ user.role }}</p>
+        <p>Statut : {{ user.status }}</p>
     {% else %}
         <h4>Client : {{ user.customer.name }}</h4>
     {% endif %}
 
-<div class="form mt-3 mt-lg-0">
-
-    {{ form_start(form) }}
+    <div class="form mt-3 mt-lg-0">
+        {{ form_start(form) }}
 
         {{ form_errors(form) }}
 
@@ -33,8 +40,6 @@
         {{ form_row(form.isMain) }}
         {{ form_row(form.submit) }}
 
-    {{ form_end(form) }}
-
-</div>
-
+        {{ form_end(form) }}
+    </div>
 {% endblock %}

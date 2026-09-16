@@ -48,7 +48,7 @@ class Contract
     private ?int $timeReal = null;
 
     // TODO : revoir le delete cascade => regarde entity User
-    
+
     #[ORM\OneToMany(mappedBy: 'contract', targetEntity: SerpInfo::class)]
     private Collection $serpInfos;
 

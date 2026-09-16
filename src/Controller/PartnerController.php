@@ -4,12 +4,12 @@ namespace App\Controller;
 
 use App\Entity\Partner;
 use App\Form\PartnerType;
-use App\Repository\PartnerRepository;
 use App\Repository\CustomerRepository;
+use App\Repository\PartnerRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/admin/partenaire')]
 class PartnerController extends AbstractController
@@ -23,19 +23,18 @@ class PartnerController extends AbstractController
         $this->customerRepository = $customerRepository;
     }
 
-
     #[Route('/', name: 'app_partner_list', methods: ['GET'])]
     public function partnerList(): Response
     {
         $partners = $this->partnerRepository->findAll();
         $customers = $this->partnerRepository->findCustomersByPartners($partners);
-    
+
         return $this->render('partner/list.html.twig', [
             'partners' => $partners,
-            'customers' => $customers
+            'customers' => $customers,
         ]);
     }
-    
+
     #[Route('/ajouter', name: 'app_partner_add', methods: ['GET', 'POST'])]
     public function partnerAdd(Request $request): Response
     {
@@ -57,7 +56,7 @@ class PartnerController extends AbstractController
         return $this->render('partner/new.html.twig', [
             'partner' => $partner,
             'form' => $form,
-            'flash' => $this
+            'flash' => $this,
         ]);
     }
 
@@ -65,10 +64,10 @@ class PartnerController extends AbstractController
     public function partnerShow(Partner $partner): Response
     {
         $customers = $this->customerRepository->findBy(['partner' => $partner]);
-    
+
         return $this->render('partner/show.html.twig', [
             'partner' => $partner,
-            'customers' => $customers
+            'customers' => $customers,
         ]);
     }
 

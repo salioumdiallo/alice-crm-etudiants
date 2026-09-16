@@ -2,364 +2,521 @@
 
 {% block cssEditor %}
     {{ parent() }}
-    <link href="{{ asset('bundles/fosckeditor/contents.css') }}" rel="stylesheet" type="text/css" />
+    <link
+        href="{{ asset('bundles/fosckeditor/contents.css') }}"
+        rel="stylesheet"
+        type="text/css"
+    />
 {% endblock %}
 
 {% block title %}Client {{ customer.name }} | Alice CRM{% endblock %}
+
 {% form_theme form 'bootstrap_5_layout.html.twig' %}
+
 {% block body %}
-
-
-    {# <div class="d-flex mb-3 me-md-1 justify-content-end d-none d-lg-flex">
-
-        
-        <a href="{{ path('app_customer_edit', { 'id': customer.id, 'slug': customer.slug }) }}" class="btn-fa-action-head-page mx-1" data-bs-toggle="tooltip" data-bs-title="Modifier le client" >
-        
-            <i class="fa-solid fa-arrows-down-to-people fa-2xl ms-1"></i> 
-            <i class="fa-solid fa-pen-to-square mx-1"></i>
-        
-        </a>
-        
-
-        <a href="{{ path('app_contract_add', { 'id': customer.id, 'slug': customer.slug }) }}" class="btn-fa-action-head-page mx-1" data-bs-toggle="tooltip" data-bs-title="Nouveau contrat">
-            <i class="fa-solid fa-file-contract fa-2xl ms-1"></i>
-            <i class="fa-solid fa-plus mx-1"></i>
-        </a>
-
-        <a href="{{ path('app_contact_add', { 'id': customer.user.id, 'slug': customer.user.slug }) }}" class="btn-fa-action-head-page mx-1" data-bs-toggle="tooltip" data-bs-title="Ajouter un contact">
-            <i class="fa-solid fa-address-book fa-2xl ms-1"></i>
-            <i class="fa-solid fa-plus mx-1"></i>
-        </a>
-        
-    </div> #}
-
-{#### Container principal ####}
-
-<div>
-
-    {#### d-flex global ####}
-
-    <div class="row">
-
-    {# div left #}
-
-        <div class="d-flex flex-wrap flex-column col-12 col-lg-6">
-
-            <div class="d-flex my-2 me-md-1 justify-content-end d-flex">
-                <a class="hover-link" href="{{ path('app_customer_edit', { 'id': customer.id, 'slug': customer.slug }) }}">Modifier le client</a>
-            </div>
-            <div class="col-12 d-flex flex-column p-2 border">
-
-                {#### Identification Client  ####}
-
-                <div class="d-flex flex-column flex-sm-row justify-content-sm-between">
-                    <div class="d-flex flex-column">
-                        <h3 class="m-0">{{ customer.user.firstname|capitalize }} {{ customer.user.lastname|upper }}</h3>
-                        <h6 class="m-0"> {{ customer.name|upper }} </h6>
-                    </div>
-                    <div class="d-flex flex-column justify-content-between">
-                        {% if customer.isProfessional == true %}
-                            <p class="text-start m-0"><i class="fa-sharp fa-solid fa-circle-check fa-lg me-1" style="color: #19374d;"></i>Professionnel</p>
-                        {% endif %}
-                        {% if customer.isPartner == true %}
-                            <p class="text-start m-0"><i class="fa-sharp fa-solid fa-circle-check fa-lg me-1" style="color: #19374d;"></i>Partenaire</p>
-                        {% endif %}
-                    </div>
+    <div>
+        <div class="row">
+            {# Partie gauche #}
+            <div class="d-flex flex-wrap flex-column col-12 col-lg-6">
+                <div class="d-flex my-2 me-md-1 justify-content-end">
+                    <a
+                        class="hover-link"
+                        href="{{ path('app_customer_edit', {
+                            'id': customer.id,
+                            'slug': customer.slug
+                        }) }}"
+                    >
+                        Modifier le client
+                    </a>
                 </div>
 
-                {### Contact Principal ###}
+                <div class="col-12 d-flex flex-column p-2 border">
+                    {# Identification client #}
+                    <div class="d-flex flex-column flex-sm-row justify-content-sm-between">
+                        <div class="d-flex flex-column">
+                            <h3 class="m-0">
+                                {{ customer.user.firstname|capitalize }}
+                                {{ customer.user.lastname|upper }}
+                            </h3>
+                            <h6 class="m-0">{{ customer.name|upper }}</h6>
+                        </div>
 
-                <div class="d-flex flex-column mt-2 border">
+                        <div class="d-flex flex-column justify-content-between">
+                            {% if customer.isProfessional == true %}
+                                <p class="text-start m-0">
+                                    <i
+                                        class="fa-sharp fa-solid fa-circle-check fa-lg me-1"
+                                        style="color: #19374d;"
+                                        aria-hidden="true"
+                                    ></i>
+                                    Professionnel
+                                </p>
+                            {% endif %}
 
-                    <h5 class="w-100 text-center m-0 py-1 bg-alice-light ">Contact Pricipal</h5>
+                            {% if customer.isPartner == true %}
+                                <p class="text-start m-0">
+                                    <i
+                                        class="fa-sharp fa-solid fa-circle-check fa-lg me-1"
+                                        style="color: #19374d;"
+                                        aria-hidden="true"
+                                    ></i>
+                                    Partenaire
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
 
-                    {% if contacts %}
+                    {# Contact principal #}
+                    <div class="d-flex flex-column mt-2 border">
+                        <h5 class="w-100 text-center m-0 py-1 bg-alice-light">
+                            Contact Principal
+                        </h5>
 
-                        {% for contact in contacts %}
+                        {% if contacts %}
+                            {% for contact in contacts %}
+                                {% if contact.isMain == true %}
+                                    <div>
+                                        <div class="card-body d-flex justify-content-between flex-column flex-sm-row align-items-center">
+                                            <div class="d-flex flex-column flex-md-row justify-content-around align-items-center col-12">
+                                                <div class="col-12 col-md-6 d-flex flex-column align-items-center">
+                                                    <div
+                                                        class="bgg-alice-light"
+                                                        style="max-width: 20rem; min-width: 15rem"
+                                                    >
+                                                        <div class="card-body mb-1">
+                                                            <p class="card-title fs-5 fw-medium">
+                                                                {{ contact.firstname|capitalize }}
+                                                                {{ contact.lastname|upper }}
+                                                            </p>
 
-                            {% if contact.isMain == true %}
-                                <div>
-                                    <div class="card-body d-flex justify-content-between flex-column flex-sm-row align-items-center">
-                                        <div class="d-flex flex-column flex-md-row justify-content-around align-items-center col-12">
-                                            <div class="col-12 col-md-6 d-flex flex-column align-items-center">
-                                                <div class="bgg-alice-light" style="max-width: 20rem; min-width: 15rem">
-                                                    <div class="card-body mb-1">
-                                                        <p class="card-title fs-5 fw-medium">{{ contact.firstname|capitalize }} {{ contact.lastname|upper }}</p>
-                                                        <p class="card-text mb-1">Email : 
-                                                            <strong>
-                                                                <a href="mailto:{{ contact.email }}" class="hover-link">{{ contact.email|lower }}</a>
-                                                            </strong>
-                                                        </p>
-                                                        <p class="card-text mb-1">Tel : 
-                                                            <strong>
-                                                                {{ contact.phone|phone_number_format('INTERNATIONAL') }}
-                                                            </strong>
-                                                        </p>
-                                                        <div class="d-flex justify-content-around px-5">
-                                                            <a href="{{ path('app_contact', { 'id': contact.id, 'slug': contact.slug}) }}" class="btn-fa-action-eye">
-                                                            <i class="fa-solid fa-eye fa-xl"></i>
-                                                            </a>
+                                                            <p class="card-text mb-1">
+                                                                Email :
+                                                                <strong>
+                                                                    <a
+                                                                        href="mailto:{{ contact.email }}"
+                                                                        class="hover-link"
+                                                                    >
+                                                                        {{ contact.email|lower }}
+                                                                    </a>
+                                                                </strong>
+                                                            </p>
+
+                                                            <p class="card-text mb-1">
+                                                                Tel :
+                                                                <strong>
+                                                                    {{ contact.phone|phone_number_format('INTERNATIONAL') }}
+                                                                </strong>
+                                                            </p>
+
+                                                            <div class="d-flex justify-content-around px-5">
+                                                                <a
+                                                                    href="{{ path('app_contact', {
+                                                                        'id': contact.id,
+                                                                        'slug': contact.slug
+                                                                    }) }}"
+                                                                    class="btn-fa-action-eye"
+                                                                    aria-label="Afficher le contact {{ contact.firstname }} {{ contact.lastname }}"
+                                                                >
+                                                                    <i
+                                                                        class="fa-solid fa-eye fa-xl"
+                                                                        aria-hidden="true"
+                                                                    ></i>
+                                                                </a>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-
-                            {% endif %}
-
-                        {% endfor %}
-
-                    {% else %}
-                        <a href="{{ path('app_contact_add', { 'id': customer.user.id, 'slug': customer.user.slug }) }}" class="btn btn-alice mx-auto">Créer un contact</a>
-                    {% endif %}
-
-
-
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <a
+                                href="{{ path('app_contact_add', {
+                                    'id': customer.user.id,
+                                    'slug': customer.user.slug
+                                }) }}"
+                                class="btn btn-alice mx-auto"
+                            >
+                                Créer un contact
+                            </a>
+                        {% endif %}
+                    </div>
                 </div>
 
-            </div>
+                {# Détail client #}
+                <div class="col-12">
+                    <div class="d-flex flex-column mt-1 border p-0">
+                        <h5 class="w-100 text-center m-0 bg-alice-light py-1">
+                            Détail Client
+                        </h5>
 
-                {#### Détail client  ####}
+                        <table class="table mb-0">
+                            <caption class="visually-hidden">
+                                Détails du client {{ customer.name }}
+                            </caption>
 
-
-            <div class="col-12">
-                <div class="d-flex flex-column mt-1 border p-0">
-
-                    <h5 class="w-100 text-center m-0 bg-alice-light py-1">Détail Client</h5>
-
-                    <table class="table mb-0">
-                        <tbody>
-                            <tr>
-                                <td>Nom</td>
-                                <td><strong>{{ customer.name|upper }}</strong></td>
-                            </tr>
-                            {% if customer.siret is not empty %}
+                            <tbody>
                                 <tr>
-                                    <td>Siret</td>
+                                    <th scope="row">Nom</th>
+                                    <td>
+                                        <strong>{{ customer.name|upper }}</strong>
+                                    </td>
+                                </tr>
+
+                                {% if customer.siret is not empty %}
+                                    <tr>
+                                        <th scope="row">Siret</th>
+                                        <td>
+                                            <strong>
+                                                {% set siret = customer.siret %}
+                                                {{ siret[:3] }}
+                                                {{ siret[3:3] }}
+                                                {{ siret[6:3] }}
+                                                {{ siret[9:5] }}
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+
+                                <tr>
+                                    <th scope="row">Adresse</th>
+                                    <td>
+                                        <strong>{{ customer.address|title }}</strong>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th scope="row">CP Ville Pays</th>
                                     <td>
                                         <strong>
-                                            {% set siret = customer.siret %}
-                                            {{ siret[:3] }} {{ siret[3:3] }} {{ siret[6:3] }} {{ siret[9:5] }}
+                                            {{ customer.zipCode }}
+                                            {{ customer.city|title }}
+                                            {{ customer.country }}
                                         </strong>
                                     </td>
                                 </tr>
-                            {% endif %}
-                            <tr>
-                                <td>Adresse</td>
-                                <td><strong>{{ customer.address|title }}</strong></td>
-                            </tr>
-                            <tr>
-                                <td>CP Ville Pays</td>
-                                <td><strong>{{ customer.zipCode }} {{ customer.city|title }} {{ customer.country }}</strong></td>
-                            </tr>
-                            <tr>
-                                <td class="align-middle py-0">Zone Tarifaire</td>
-                                <td  class="py-0">
-                                    <table class="table m-0 table-borderless table-sm">
-                                        <tr>
-                                            <td class="col-6"><strong>{{ customer.tariffZone.name|capitalize }}</strong></td>
-                                            <td class="col-6"><strong>{{ customer.tariffZone.amount }} €</strong></td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                            {% if customer.partner is not null %}
+
                                 <tr>
-                                    <td class="align-middle py-0">Partenariat</td>
+                                    <th scope="row" class="align-middle py-0">
+                                        Zone Tarifaire
+                                    </th>
                                     <td class="py-0">
-                                        <table class="table m-0 table-borderless table-sm">
-                                            <tr>
-                                                <td class="col-6"><strong>{{ customer.partner.name|capitalize }}</strong></td>
-                                                <td class="col-6"><strong>{{ customer.partner.discountRate }} %</strong></td>
-                                            </tr>
-                                        </table>
+                                        <strong>
+                                            {{ customer.tariffZone.name|capitalize }}
+                                            — {{ customer.tariffZone.amount }} €
+                                        </strong>
                                     </td>
                                 </tr>
-                            {% endif %}
-                        </tbody>
-                    </table>
 
-                </div>
-            </div>
-
-                {#### Autres contacts  ####}
-
-            <div class="col-12">
-
-                <div class="d-flex my-2 me-md-1 justify-content-end d-flex">
-                    <a class="hover-link" href="{{ path('app_contact_add', { 'id': customer.user.id, 'slug': customer.user.slug }) }}">Ajouter un contact</a>
-                </div>
-
-                <div class="d-flex flex-column mt-1 border p-0">
-
-                    <h6 class="w-100 text-center m-0 bg-alice-light py-1">Autres Contacts</h6>
-
-                    {% for contact in contacts %}
-                        {% if contact.isMain == false %}
-
-                    <div class="d-flex flex-column mt-1 border p-0 col-12">
-
-                        <table class="table mb-0 mt-1" data-name="tableContact">
-
-
-                            <div class="d-flex bg-alice-light justify-content-between">
-                                <div>
-                                    <p class="text-center m-0 py-1 fs-6 fw-medium">{{ contact.firstname|capitalize }} {{ contact.lastname|upper }}</p>
-                                    <p class="p-0 m-0 fs-6 fst-italic">{{ contact.position }}</p>
-                                </div>
-                                <div class="d-flex">
-                                    <div class="d-flex">
-                                        <a href="{{ path('app_contact', { 'id': contact.id, 'slug': contact.slug}) }}" class="my-auto mx-1 btn-fa-action-eye"><i class="fa-solid fa-eye fa-xl"></i></a>
-                                    </div>
-                                    <div data-name="button-control-view-div-contact" class="d-flex">
-                                        <div class="my-auto mx-1 btn-fa-plus-minus" data-name="img-show-detail-contact">
-                                            <i class="fa-solid fa-circle-plus fa-xl"></i>
-                                        </div>
-                                        <div class="my-auto mx-1 btn-fa-plus-minus" data-name="img-hide-contact-detail" style="display:none;">
-                                            <i class="fa-solid fa-circle-minus fa-xl"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            <tbody>
+                                {% if customer.partner is not null %}
                                     <tr>
-                                        <td>Email</td>
-                                        <td class="overflow-x-hidden"> 
-                                            <b>
-                                                <a href="mailto:{{ contact.email }}" class="hover-link">{{ contact.email }}</a>
-                                            </b>
+                                        <th scope="row" class="align-middle py-0">
+                                            Partenariat
+                                        </th>
+                                        <td class="py-0">
+                                            <strong>
+                                                {{ customer.partner.name|capitalize }}
+                                                — {{ customer.partner.discountRate }} %
+                                            </strong>
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td>Tel</td>
-                                        <td>
-                                            <p><b>{{ contact.phone|phone_number_format('INTERNATIONAL') }}</b></p>
-                                        </td>
-                                    </tr>
+                                {% endif %}
                             </tbody>
-
                         </table>
                     </div>
-
-                        {% endif %}
-                    {% endfor %}
                 </div>
 
-            </div>
+                {# Autres contacts #}
+                <div class="col-12">
+                    <div class="d-flex my-2 me-md-1 justify-content-end">
+                        <a
+                            class="hover-link"
+                            href="{{ path('app_contact_add', {
+                                'id': customer.user.id,
+                                'slug': customer.user.slug
+                            }) }}"
+                        >
+                            Ajouter un contact
+                        </a>
+                    </div>
 
+                    <div class="d-flex flex-column mt-1 border p-0">
+                        <h6 class="w-100 text-center m-0 bg-alice-light py-1">
+                            Autres Contacts
+                        </h6>
 
-
-        </div>
-
-
-
-        {# div right #}
-
-        <div class="d-flex flex-wrap flex-column col-12 col-lg-6">
-
-                {#### CONTRATS ####}
-            <div class="d-flex my-2 me-md-1 justify-content-end d-flex">
-                <a class="hover-link" href="{{ path('app_contract_add', { 'id': customer.id, 'slug': customer.slug }) }}">Ajouter un Contrat</a>
-            </div>
-
-            <div class="col-12 flex-column flex-md-row justify-content-md-between">
-
-                <div class="d-flex w-100 flex-column border p-0">
-
-                    <h5 class="w-100 text-center m-0 bg-alice-light py-1">Contrats</h5>
-
-                    <div class="d-flex flex-column">
-
-                                {% for contract in contracts %}
-
-                            <div class="d-flex flex-column mt-1 border p-0 col-12">
-
-                                <table class="table mb-0" data-name="tableContract">
-
+                        {% for contact in contacts %}
+                            {% if contact.isMain == false %}
+                                <div class="d-flex flex-column mt-1 border p-0 col-12">
                                     <div class="d-flex bg-alice-light justify-content-between">
                                         <div>
-                                            <h6 class="text-center m-0 py-1">Contrat {{ contract.name }}</h6>
+                                            <p class="text-center m-0 py-1 fs-6 fw-medium">
+                                                {{ contact.firstname|capitalize }}
+                                                {{ contact.lastname|upper }}
+                                            </p>
+
+                                            <p class="p-0 m-0 fs-6 fst-italic">
+                                                {{ contact.position }}
+                                            </p>
                                         </div>
+
                                         <div class="d-flex">
                                             <div class="d-flex">
-                                                    <a href="{{ path('app_contract_show', { 'id': contract.id }) }}" class="my-auto mx-1 btn-fa-action-eye"><i class="fa-solid fa-eye fa-xl"></i></a>
+                                                <a
+                                                    href="{{ path('app_contact', {
+                                                        'id': contact.id,
+                                                        'slug': contact.slug
+                                                    }) }}"
+                                                    class="my-auto mx-1 btn-fa-action-eye"
+                                                    aria-label="Afficher le contact {{ contact.firstname }} {{ contact.lastname }}"
+                                                >
+                                                    <i
+                                                        class="fa-solid fa-eye fa-xl"
+                                                        aria-hidden="true"
+                                                    ></i>
+                                                </a>
                                             </div>
 
-                                            <div data-name="controlButtonDivContract" class="d-flex">
-                                                <div class="my-auto mx-1 btn-fa-plus-minus" data-name="img-show-contract-detail">
-                                                    <i class="fa-solid fa-circle-plus fa-xl"></i>
+                                            <div
+                                                data-name="button-control-view-div-contact"
+                                                class="d-flex"
+                                            >
+                                                <div
+                                                    class="my-auto mx-1 btn-fa-plus-minus"
+                                                    data-name="img-show-detail-contact"
+                                                >
+                                                    <i
+                                                        class="fa-solid fa-circle-plus fa-xl"
+                                                        aria-hidden="true"
+                                                    ></i>
                                                 </div>
 
-                                                <div class="my-auto mx-1 btn-fa-plus-minus" data-name="img-hide-contract-detail" style="display:none;">
-                                                    <i class="fa-solid fa-circle-minus fa-xl"></i>
+                                                <div
+                                                    class="my-auto mx-1 btn-fa-plus-minus"
+                                                    data-name="img-hide-contact-detail"
+                                                    style="display:none;"
+                                                >
+                                                    <i
+                                                        class="fa-solid fa-circle-minus fa-xl"
+                                                        aria-hidden="true"
+                                                    ></i>
                                                 </div>
                                             </div>
-
                                         </div>
                                     </div>
 
-                                    <tbody>
-                                        <tr>
-                                            <td>Date</td>
-                                            <td>{{ contract.date|date("m/d/Y") }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Montant facturé</td>
-                                            <td>{{ contract.amountCharged }} €</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Temps facturé</td>
-                                            <td>{{ contract.timeCharged }} heures</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Montant réel</td>
-                                            <td>{{ contract.amountReal }} €</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Temps réel</td>
-                                            <td>{{ contract.timeReal }} heures</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Site géré par le contrat</td>
-                                            <td><a href="{{ contract.websiteLink }}" target="_blank" class="hover-link">{{ contract.websiteLink }}</a></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Fractionnement</td>
-                                            <td>{{ contract.paymentFrequency }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Commentaires</td>
-                                            <td>{{ contract.openArea }}</td>
-                                        </tr>
-                                    </tbody>
+                                    <table
+                                        class="table mb-0 mt-1"
+                                        data-name="tableContact"
+                                    >
+                                        <caption class="visually-hidden">
+                                            Coordonnées de {{ contact.firstname }}
+                                            {{ contact.lastname }}
+                                        </caption>
 
-                                </table>
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row">Email</th>
+                                                <td class="overflow-x-hidden">
+                                                    <b>
+                                                        <a
+                                                            href="mailto:{{ contact.email }}"
+                                                            class="hover-link"
+                                                        >
+                                                            {{ contact.email }}
+                                                        </a>
+                                                    </b>
+                                                </td>
+                                            </tr>
 
-                            </div>
-
+                                            <tr>
+                                                <th scope="row">Tel</th>
+                                                <td>
+                                                    <p>
+                                                        <b>
+                                                            {{ contact.phone|phone_number_format('INTERNATIONAL') }}
+                                                        </b>
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% endif %}
                         {% endfor %}
-
                     </div>
-
                 </div>
-
             </div>
 
+            {# Partie droite : contrats #}
+            <div class="d-flex flex-wrap flex-column col-12 col-lg-6">
+                <div class="d-flex my-2 me-md-1 justify-content-end">
+                    <a
+                        class="hover-link"
+                        href="{{ path('app_contract_add', {
+                            'id': customer.id,
+                            'slug': customer.slug
+                        }) }}"
+                    >
+                        Ajouter un Contrat
+                    </a>
+                </div>
+
+                <div class="col-12 flex-column flex-md-row justify-content-md-between">
+                    <div class="d-flex w-100 flex-column border p-0">
+                        <h5 class="w-100 text-center m-0 bg-alice-light py-1">
+                            Contrats
+                        </h5>
+
+                        <div class="d-flex flex-column">
+                            {% for contract in contracts %}
+                                <div class="d-flex flex-column mt-1 border p-0 col-12">
+                                    <div class="d-flex bg-alice-light justify-content-between">
+                                        <div>
+                                            <h6 class="text-center m-0 py-1">
+                                                Contrat {{ contract.name }}
+                                            </h6>
+                                        </div>
+
+                                        <div class="d-flex">
+                                            <div class="d-flex">
+                                                <a
+                                                    href="{{ path('app_contract_show', {
+                                                        'id': contract.id
+                                                    }) }}"
+                                                    class="my-auto mx-1 btn-fa-action-eye"
+                                                    aria-label="Afficher le contrat {{ contract.name }}"
+                                                >
+                                                    <i
+                                                        class="fa-solid fa-eye fa-xl"
+                                                        aria-hidden="true"
+                                                    ></i>
+                                                </a>
+                                            </div>
+
+                                            <div
+                                                data-name="controlButtonDivContract"
+                                                class="d-flex"
+                                            >
+                                                <div
+                                                    class="my-auto mx-1 btn-fa-plus-minus"
+                                                    data-name="img-show-contract-detail"
+                                                >
+                                                    <i
+                                                        class="fa-solid fa-circle-plus fa-xl"
+                                                        aria-hidden="true"
+                                                    ></i>
+                                                </div>
+
+                                                <div
+                                                    class="my-auto mx-1 btn-fa-plus-minus"
+                                                    data-name="img-hide-contract-detail"
+                                                    style="display:none;"
+                                                >
+                                                    <i
+                                                        class="fa-solid fa-circle-minus fa-xl"
+                                                        aria-hidden="true"
+                                                    ></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <table
+                                        class="table mb-0"
+                                        data-name="tableContract"
+                                    >
+                                        <caption class="visually-hidden">
+                                            Détails du contrat {{ contract.name }}
+                                        </caption>
+
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row">Date</th>
+                                                <td>
+                                                    {{ contract.date|date('d/m/Y') }}
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <th scope="row">Montant facturé</th>
+                                                <td>
+                                                    {{ contract.amountCharged }} €
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <th scope="row">Temps facturé</th>
+                                                <td>
+                                                    {{ contract.timeCharged }} heures
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <th scope="row">Montant réel</th>
+                                                <td>
+                                                    {{ contract.amountReal }} €
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <th scope="row">Temps réel</th>
+                                                <td>
+                                                    {{ contract.timeReal }} heures
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <th scope="row">
+                                                    Site géré par le contrat
+                                                </th>
+                                                <td>
+                                                    <a
+                                                        href="{{ contract.websiteLink }}"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        class="hover-link"
+                                                    >
+                                                        {{ contract.websiteLink }}
+                                                    </a>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <th scope="row">Fractionnement</th>
+                                                <td>
+                                                    {{ contract.paymentFrequency }}
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <th scope="row">Commentaires</th>
+                                                <td>
+                                                    {{ contract.openArea }}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
+        <h3 class="mt-5">Notes</h3>
+
+        <div id="dynamic-content" class="border p-3 mt-1 mb-5">
+            {{ display_dynamic_content(
+                'notes_' ~ customer.slug ~ customer.id,
+                customer.slug,
+                customer.id
+            ) }}
+        </div>
     </div>
-
-    <h3 class="mt-5">Notes</h3>
-    <div id="dynamic-content" class="border p-3 mt-1 mb-5">
-            {{ display_dynamic_content("notes_" ~ customer.slug ~ customer.id, customer.slug, customer.id) }}
-    </div>
-
-</div>
-
 {% endblock %}
 
 {% block javascriptEditor %}

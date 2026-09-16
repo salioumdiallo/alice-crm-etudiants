@@ -3,58 +3,84 @@
 {% block title %}Mes utilisateurs | Alice CRM{% endblock %}
 
 {% block body %}
-
     <div class="d-flex align-items-center justify-content-between mb-3">
-        <h1>Liste des Utilisateurs</h1>
-        <div class="button-go-back" alt="Retour page précédente" onclick="window.history.back();">
+        <h1>Liste des utilisateurs</h1>
+
+        <div
+            class="button-go-back"
+            alt="Retour page précédente"
+            onclick="window.history.back();"
+        >
             <i class="fa-sharp fa-solid fa-circle-chevron-left fa-2xl"></i>
         </div>
     </div>
 
-
-{# Ajouter un utilisateur #}
-
+    {# Ajouter un utilisateur #}
     <div class="d-flex flex-column align-items-center flex-sm-row justify-content-sm-end align-items-sm-baseline me-sm-2">
-        <p>Créer un utilisateur :   </p>
-        <a href=" {{ path('app_user_add') }} " class="btn-fa-action-head-page ms-sm-3"><i class="fa-solid fa-user-plus fa-lg"></i></a>
+        <p>Créer un utilisateur :</p>
+
+        <a href="{{ path('app_user_add') }}" class="btn-fa-action-head-page ms-sm-3">
+            <i class="fa-solid fa-user-plus fa-lg"></i>
+        </a>
     </div>
 
-  {# TODO : virer definir un role à l'admin #}
-
     {% for user in users %}
-
         <div class="card m-2">
             <div class="card-body bgg-alice-light d-flex justify-content-between flex-column flex-sm-row align-items-center">
                 <div class="d-flex flex-column justify-content-around col-sm-6 align-items-center">
-                    <h5 class="card-title">{{ user.firstname|capitalize }} {{ user.lastname|upper }}</h5>
-                    <h6 class="card-subtitle mb-2 text-body-secondary">{{ user.email }}</h6>
-                        <p class="card-text"> 
-                            {% if user.roles[0] == "ROLE_USER" %}
-                                {% if user.role is null %}
-                                    <a href="{{ path('app_user_edit', { 'id': user.id, 'slug': user.slug}) }}" class="hover-link">Définir un rôle</a>
-                                {% else %}
-                                    Role : {{ user.role }}
-                                {% endif %}
-                            {% endif %}
-                        </p>
-                </div>
-                <div class="d-flex flex-column justify-content-around col-sm-6 align-items-center">
-                    <a href="{{ path('app_user_show', { 'id': user.id, 'slug': user.slug}) }}" class="btn btn-alice-lg">Consulter</a><br>
-                    
-                    {% if user.roles[0] == "ROLE_USER" %}
+                    <h5 class="card-title">
+                        {{ user.firstname|capitalize }} {{ user.lastname|upper }}
+                    </h5>
 
-                        {% if user.customer is null %}
-                            <a href="{{ path('app_customer_add', { 'id': user.id, 'slug': user.slug}) }}" class="btn btn-alice-lg">Créer une fiche client</a> 
-                        {% else %}
-                            <a href="{{ path('app_customer', { 'id': user.customer.id, 'slug': user.customer.slug}) }}" class="btn btn-alice-lg">Consulter la fiche client</a> 
+                    <h6 class="card-subtitle mb-2 text-body-secondary">
+                        {{ user.email }}
+                    </h6>
+
+                    <p class="card-text">
+                        {% if user.roles[0] == 'ROLE_USER' %}
+                            {% if user.status is null %}
+                                <a
+                                    href="{{ path('app_user_edit', {'id': user.id, 'slug': user.slug}) }}"
+                                    class="hover-link"
+                                >
+                                    Définir un statut
+                                </a>
+                            {% else %}
+                                Statut : {{ user.status }}
+                            {% endif %}
                         {% endif %}
-                        
+                    </p>
+                </div>
+
+                <div class="d-flex flex-column justify-content-around col-sm-6 align-items-center">
+                    <a
+                        href="{{ path('app_user_show', {'id': user.id, 'slug': user.slug}) }}"
+                        class="btn btn-alice-lg"
+                    >
+                        Consulter
+                    </a>
+
+                    <br>
+
+                    {% if user.roles[0] == 'ROLE_USER' %}
+                        {% if user.customer is null %}
+                            <a
+                                href="{{ path('app_customer_add', {'id': user.id, 'slug': user.slug}) }}"
+                                class="btn btn-alice-lg"
+                            >
+                                Créer une fiche client
+                            </a>
+                        {% else %}
+                            <a
+                                href="{{ path('app_customer', {'id': user.customer.id, 'slug': user.customer.slug}) }}"
+                                class="btn btn-alice-lg"
+                            >
+                                Consulter la fiche client
+                            </a>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>
         </div>
-
-
     {% endfor %}
-
 {% endblock %}

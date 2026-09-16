@@ -5,151 +5,230 @@
 {% block body %}
     <div class="d-flex align-items-center justify-content-between mb-3">
         <h1>{{ contract.name }}</h1>
-        <div class="button-go-back" alt="Retour page précédente" onclick="window.history.back();">
+        <div
+            class="button-go-back"
+            aria-label="Retour à la page précédente"
+            role="button"
+            tabindex="0"
+            onclick="window.history.back();"
+        >
             <i class="fa-sharp fa-solid fa-circle-chevron-left fa-2xl"></i>
         </div>
     </div>
-    
+
     <div class="d-flex my-2 me-md-1 justify-content-end d-lg-flex">
+        <a
+            href="{{ path('app_contract_edit', { 'id': contract.id }) }}"
+            class="btn-fa-action-head-page mx-2"
+            aria-label="Modifier le contrat"
+        >
+            <i class="fa-solid fa-pen-to-square fa-xl"></i>
+        </a>
 
-        <a href="{{ path('app_contract_edit', { 'id': contract.id }) }}" class="btn-fa-action-head-page mx-2"><i class="fa-solid fa-pen-to-square fa-xl"></i></a>
-        <form method="post" action="{{ path('app_contract_remove', { 'id': contract.id }) }}" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce contrat ?');">
-            <input type="hidden" name="_token" value="{{ csrf_token('delete_contract' ~ contract.id) }}">
-            <button type="submit" class="btn-fa-action-head-supp mx-2 border-0 bg-transparent" aria-label="Supprimer le contrat"><i class="fa-solid fa-trash fa-xl"></i></button>
+        <form
+            method="post"
+            action="{{ path('app_contract_remove', { 'id': contract.id }) }}"
+            class="d-inline"
+            onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce contrat ?');"
+        >
+            <input
+                type="hidden"
+                name="_token"
+                value="{{ csrf_token('delete_contract' ~ contract.id) }}"
+            >
+            <button
+                type="submit"
+                class="btn-fa-action-head-supp mx-2 border-0 bg-transparent"
+                aria-label="Supprimer le contrat"
+            >
+                <i class="fa-solid fa-trash fa-xl"></i>
+            </button>
         </form>
-
     </div>
 
-<div class="table-responsive me-lg-5">
-
-
-    <table class="table">
-
-        <thead>
-            <tr>
-                <th scope="col">Client</th>
-                <td><a href="{{ path('app_customer', { 'id': contract.customer.id, 'slug': contract.customer.slug }) }}" class="hover-link">{{ contract.customer}}</a></td>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <th scope="col">Site Client</th>
-                <td><a href="{{ contract.websiteLink }}" target="_blank" id="url" class="hover-link">{{ contract.websiteLink }}</a></td>
-            </tr>
-            <tr>
-                <th scope="col">Date</th>
-                <td>{{ contract.date|date("d/m/Y") }}</td>
-            </tr>
-
-            <tr>
-                <th scope="col">Fractionnement</th>
-                <td>{{ contract.paymentFrequency }}</td>
-            </tr>
-            <tr>
-                <th scope="col">Commentaires</th>
-                <td>{{ contract.openArea }}</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-
-
-
-{# Point de vue Financier  #}
-
-<div class="mt-5">
-    <h3>Point de vue financier</h3>
-    {% set differenceAmount = contract.amountCharged - contract.amountReal %}
-    {% set differenceTime = contract.timeCharged - contract.timeReal %}
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col"></th>
-                <th scope="row">Heures</th>
-                <th scope="row">Montant</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <th scope="col">Éléments Facturés</th>
-                <td>{{ contract.timeCharged }}</td>
-                <td>{{ contract.amountCharged }}</td>
-            </tr>
-            <tr>
-                <th scope="col">Éléments Réels</th>
-                <td>{{ contract.timeReal }}</td>
-                <td>{{ contract.amountReal }}</td>
-            </tr>
-            <tr>
-                <th class="d-flex">
-                {# TODO : à faire en ternaire  #}
-                    <p class="m-0 {% if contract.timeCharged > contract.timeReal %} text-success {% else %} text-danger {% endif %}">Delta
-                    {% if contract.timeCharged > contract.timeReal %}positif{% else %}négatif{% endif %}
-                    </p>
-                </th>
-                <th>
-                    {% if contract.timeCharged > contract.timeReal %}
-                        <p class="text-success m-0">{{ differenceTime }} heures</p>
-                    {% else %}
-                        <p class="text-danger m-0">{{ differenceTime }} heures</p>
-                    {% endif %}
-                </td>
-                <th>
-                    {% if contract.amountCharged > contract.amountReal %}
-                        <p class="text-success m-0">{{ differenceAmount|format_currency('EUR') }}</p>
-                    {% else %}
-                        <p class="text-danger m-0">{{ differenceAmount|format_currency('EUR') }}</p>
-                    {% endif %}
-                </td>
-            </tr>
-        </tbody>
-    </table>
-
-{# classement web #}
-
-    <div class="my-5">
-        <h3>Référencement par mots-clés</h3>
+    <div class="table-responsive me-lg-5">
+        <table class="table">
+            <caption class="visually-hidden">
+                Informations générales du contrat {{ contract.name }}
+            </caption>
+            <tbody>
+                <tr>
+                    <th scope="row">Client</th>
+                    <td>
+                        <a
+                            href="{{ path('app_customer', { 'id': contract.customer.id, 'slug': contract.customer.slug }) }}"
+                            class="hover-link"
+                        >
+                            {{ contract.customer }}
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Site Client</th>
+                    <td>
+                        <a
+                            href="{{ contract.websiteLink }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            id="url"
+                            class="hover-link"
+                        >
+                            {{ contract.websiteLink }}
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Date</th>
+                    <td>{{ contract.date|date('d/m/Y') }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Fractionnement</th>
+                    <td>{{ contract.paymentFrequency }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Commentaires</th>
+                    <td>{{ contract.openArea }}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
+
+    {# Point de vue financier #}
+
+    <div class="mt-5">
+        <h3>Point de vue financier</h3>
+
+        {% set differenceAmount = contract.amountCharged - contract.amountReal %}
+        {% set differenceTime = contract.timeCharged - contract.timeReal %}
+
+        <table class="table">
+            <caption class="visually-hidden">
+                Comparaison des éléments financiers facturés et réels du contrat
+            </caption>
+            <thead>
+                <tr>
+                    <th scope="col">Type</th>
+                    <th scope="col">Heures</th>
+                    <th scope="col">Montant</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">Éléments facturés</th>
+                    <td>{{ contract.timeCharged }}</td>
+                    <td>{{ contract.amountCharged }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Éléments réels</th>
+                    <td>{{ contract.timeReal }}</td>
+                    <td>{{ contract.amountReal }}</td>
+                </tr>
+                <tr>
+                    <th scope="row" class="d-flex">
+                        <p class="m-0 {% if contract.timeCharged > contract.timeReal %}text-success{% else %}text-danger{% endif %}">
+                            Delta {% if contract.timeCharged > contract.timeReal %}positif{% else %}négatif{% endif %}
+                        </p>
+                    </th>
+                    <td>
+                        {% if contract.timeCharged > contract.timeReal %}
+                            <p class="text-success m-0">{{ differenceTime }} heures</p>
+                        {% else %}
+                            <p class="text-danger m-0">{{ differenceTime }} heures</p>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if contract.amountCharged > contract.amountReal %}
+                            <p class="text-success m-0">{{ differenceAmount|format_currency('EUR') }}</p>
+                        {% else %}
+                            <p class="text-danger m-0">{{ differenceAmount|format_currency('EUR') }}</p>
+                        {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        {# Classement web #}
+
+        <div class="my-5">
+            <h3>Référencement par mots-clés</h3>
+        </div>
+
         {% for serpInfo in serpInfos %}
-            <div class="row keyword-container d-flex flex-row mb-2 align-items-center" 
-                    data-keyword="{{ serpInfo.id }}" 
-                    data-google-api-key="{{ googleApiKey }}" 
-                    data-google-custom-api-key="{{ googleCustomApiKey }}">
-                <form method="post" action="{{ path('app_serp_info_remove', { 'id': contract.id, 'serpInfoId': serpInfo.id }) }}" class="col-3 offset-1 col-md-1 offset-md-1" onsubmit="return confirm('Supprimer ce mot-clé ?');">
-                    <input type="hidden" name="_token" value="{{ csrf_token('delete_serp_info' ~ serpInfo.id) }}">
-                    <button type="submit" class="btn btn-block btn-sm btn-outline-danger" id="btn-sup-keyword">X</button>
+            <div
+                class="row keyword-container d-flex flex-row mb-2 align-items-center"
+                data-keyword="{{ serpInfo.id }}"
+            >
+                <form
+                    method="post"
+                    action="{{ path('app_serp_info_remove', { 'id': contract.id, 'serpInfoId': serpInfo.id }) }}"
+                    class="col-3 offset-1 col-md-1 offset-md-1"
+                    onsubmit="return confirm('Supprimer ce mot-clé ?');"
+                >
+                    <input
+                        type="hidden"
+                        name="_token"
+                        value="{{ csrf_token('delete_serp_info' ~ serpInfo.id) }}"
+                    >
+                    <button
+                        type="submit"
+                        class="btn btn-block btn-sm btn-outline-danger"
+                        id="btn-sup-keyword"
+                        aria-label="Supprimer le mot-clé"
+                    >
+                        X
+                    </button>
                 </form>
-                <div type="text" class="keyword fw-semibold col-6 col-md-5 offset-md-1">
+
+                <div class="keyword fw-semibold col-6 col-md-5 offset-md-1">
                     {{ serpInfo.keyword|capitalize }}
                 </div>
-                <div id="rank{{ serpInfo.id }}" class="col-12 mt-2 col-md-4"></div>
+
+                <div
+                    id="rank{{ serpInfo.id }}"
+                    class="col-12 mt-2 col-md-4"
+                ></div>
             </div>
         {% endfor %}
-    <div class="row d-flex flex-row my-5 align-items-center justify-content-center">
-        <span class="btn btn-alice col-10 col-md-6 col-lg-4 add-serp-button">Ajouter un mot clé</span>
-        <div class="serp-info-form flex-column flex-md-row justify-content-center align-items-center">
-            <span class="fs-5 mb-3 mb-md-0">Mot clé : </span>
-            <div class="d-flex flex-column align-items-center flex-md-row">
-                <div class="mx-sm-3 ">
-                    {{ form_start(serpInfoForm) }}
-                    {{ form_row(serpInfoForm.keyword) }}
-                </div>
-                <div class="d-flex flex-row mt-2 mt-md-0" >
-                    {{ form_row(serpInfoForm.save) }}
-                    {{ form_end(serpInfoForm) }}
-                    <button class="btn btn-danger px-3 close-serp-form m-auto mx-3">Annuler</button>
+
+        <div class="row d-flex flex-row my-5 align-items-center justify-content-center">
+            <span class="btn btn-alice col-10 col-md-6 col-lg-4 add-serp-button">
+                Ajouter un mot clé
+            </span>
+
+            <div class="serp-info-form flex-column flex-md-row justify-content-center align-items-center">
+                <span class="fs-5 mb-3 mb-md-0">Mot clé :</span>
+
+                <div class="d-flex flex-column align-items-center flex-md-row">
+                    <div class="mx-sm-3">
+                        {{ form_start(serpInfoForm) }}
+                        {{ form_row(serpInfoForm.keyword) }}
+                    </div>
+
+                    <div class="d-flex flex-row mt-2 mt-md-0">
+                        {{ form_row(serpInfoForm.save) }}
+                        {{ form_end(serpInfoForm) }}
+
+                        <button class="btn btn-danger px-3 close-serp-form m-auto mx-3">
+                            Annuler
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="d-flex flex-column justify-content-center align-items-center mb-5 px-0 mt-2">
-            <div id="serp" class="btn btn-alice-serp col-10 col-md-6 col-lg-4">Afficher les résultats</div>
-            <div class="col-10 col-md-6 col-lg-4 mt-2">
-                {{ form(serpResultForm) }}
+
+            <div class="d-flex flex-column justify-content-center align-items-center mb-5 px-0 mt-2">
+                <div
+                    id="serp"
+                    class="btn btn-alice-serp col-10 col-md-6 col-lg-4"
+                >
+                    Afficher les résultats
+                </div>
+
+                <div class="col-10 col-md-6 col-lg-4 mt-2">
+                    {{ form(serpResultForm) }}
+                </div>
             </div>
         </div>
     </div>
 
-</div>
     <script src="{{ asset('assets/js/serp_checker.js') }}"></script>
 {% endblock %}

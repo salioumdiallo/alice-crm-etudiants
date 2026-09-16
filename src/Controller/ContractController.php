@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Contract;
@@ -8,33 +10,26 @@ use App\Entity\SerpResult;
 use App\Form\ContractType;
 use App\Form\SerpInfoType;
 use App\Form\SerpResultType;
-use App\Form\EditContractType;
 use App\Repository\ContractRepository;
 use App\Repository\CustomerRepository;
+use App\Service\GoogleSearchService;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Doctrine\Persistence\ManagerRegistry as PersistenceManagerRegistry;
-
 
 #[Route('/admin/contrat')]
 class ContractController extends AbstractController
 {
-
-    private $entityManager;
-    private $contractRepository;
-    private $customerRepository;
-
-    public function __construct(EntityManagerInterface $entityManager, ContractRepository $contractRepository, CustomerRepository $customerRepository)
-    {
-        $this->entityManager = $entityManager;
-        $this->contractRepository = $contractRepository;
-        $this->customerRepository = $customerRepository;
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private ContractRepository $contractRepository,
+        private CustomerRepository $customerRepository,
+        private GoogleSearchService $googleSearchService,
+    ) {
     }
 
     #[Route('/', name: 'app_contract_list')]
@@ -43,126 +38,80 @@ class ContractController extends AbstractController
         $contracts = $this->contractRepository->findAll();
 
         return $this->render('admin_main/contract_list.html.twig', [
-            'contracts' => $contracts
+            'contracts' => $contracts,
         ]);
     }
 
     #[Route('/{id}', name: 'app_contract_show')]
-    public function showContract($id, Request $request, ManagerRegistry $doctrine): Response
+    public function showContract(int $id, Request $request): Response
     {
         $contract = $this->contractRepository->findOneById($id);
-        $serpInfos = $contract->getSerpInfos();
-        $googleApiKey = $this->getParameter('app.googlesearch.api_key');
-        $googleCustomApiKey = $this->getParameter('app.googlecustomsearch.api_key');
 
-        $serpInfoForm=$this->createForm(SerpInfoType::class);
+        if (!$contract) {
+            $this->addFlash(
+                'error',
+                'Le contrat n\'existe pas.'
+            );
+
+            return $this->redirectToRoute('app_contract_list');
+        }
+
+        $serpInfos = $contract->getSerpInfos();
+
+        $serpInfoForm = $this->createForm(SerpInfoType::class);
         $serpInfoForm->handleRequest($request);
 
-        if($serpInfoForm->isSubmitted() && $serpInfoForm->isValid()) {
-            $newSerpInfo = new SerpInfo();
-            $newKeyword = $serpInfoForm->get('keyword')->getData();
-            $newSerpInfo->setKeyword($newKeyword);
-            $newSerpInfo->setContract($contract);
-
-
-            $em = $doctrine->getManager();
-            $em->persist($newSerpInfo);
-            $em->flush();
-
-            $this->addFlash('success', 'Mot clé enregistré avec succès');
-
-            return $this->redirectToRoute('app_contract_show', ['id' => $id]);
+        if ($serpInfoForm->isSubmitted() && $serpInfoForm->isValid()) {
+            return $this->handleSerpInfoForm($serpInfoForm, $contract);
         }
 
         $serpResultForm = $this->createForm(SerpResultType::class);
         $serpResultForm->handleRequest($request);
-    
+
         if ($serpResultForm->isSubmitted() && $serpResultForm->isValid()) {
-            $newSerpResults = [];
-    
-            foreach ($serpInfos as $serpInfo) {
-                $newSerpResult = new SerpResult();
-                $keyword = $serpInfo->getKeyword();
-                $url = 'https://www.googleapis.com/customsearch/v1?key=' . $googleApiKey . '&cx=' . $googleCustomApiKey . '&q=' . urlencode($keyword);
-                $response = HttpClient::create()->request('GET', $url);
-                $content = json_decode($response->getContent());
-                $newRank = null;
-    
-                if (isset($content->items)) {
-                    foreach ($content->items as $index => $item) {
-                        if (stripos($item->link, $contract->getWebsiteLink()) !== false) {
-                            $newRank = $index + 1;
-                            break;
-                        }
-                    }
-                }
-    
-                if ($newRank) {
-                    $newSerpResult->setGoogleRank($newRank);
-                    $newSerpResult->setSerpInfo($serpInfo);
-                    $newSerpResult->setDate(new \DateTime());
-    
-                    $newSerpResults[] = $newSerpResult;
-                }
-            }
-    
-            if (!empty($newSerpResults)) {
-                $em = $doctrine->getManager();
-    
-                foreach ($newSerpResults as $newSerpResult) {
-                    $em->persist($newSerpResult);
-                }
-    
-                $em->flush();
-    
-                $this->addFlash('success', 'Rangs enregistrés avec succès');
-            } else {
-                $this->addFlash('error', 'Le site n\'a pas été trouvé dans les résultats de recherche Google pour aucun des mots-clés.');
-            }
-    
-            return $this->redirectToRoute('app_contract_show', ['id' => $id]);
+            return $this->handleSerpResultForm($contract);
         }
-        
+
         return $this->render('admin_main/contract_show.html.twig', [
             'serpInfoForm' => $serpInfoForm->createView(),
             'contract' => $contract,
             'serpInfos' => $serpInfos,
-            'googleApiKey' => $googleApiKey,
-            'googleCustomApiKey' => $googleCustomApiKey,
-            'serpResultForm' => $serpResultForm->createView()
+            'serpResultForm' => $serpResultForm->createView(),
         ]);
     }
 
     #[Route('/{id}/{slug}/creer-un-contrat', name: 'app_contract_add')]
-    public function createContract(Request $request, $id): Response
+    public function createContract(Request $request, int $id): Response
     {
         $customer = $this->customerRepository->findOneById($id);
-        $slug = $customer->getSlug();
 
-        $contract = new Contract;
+        if (!$customer) {
+            $this->addFlash(
+                'error',
+                'Le client n\'existe pas.'
+            );
 
+            return $this->redirectToRoute('app_customer_list');
+        }
 
-        $form = $this->createForm(ContractType::class, $contract, [
-            'customer' => $customer,
-        ]);
+        $contract = new Contract();
         $contract->setCustomer($customer);
 
+        $form = $this->createForm(ContractType::class, $contract);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
-            if ($form->isValid()) {
-                $contract = $form->getData();
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->contractRepository->save($contract, true);
 
-                $this->contractRepository->save($contract, true);
+            $this->addFlash(
+                'success',
+                'La création du contrat est bien enregistrée.'
+            );
 
-                $this->addFlash(
-                    'success',
-                    'La création du contrat est bien enregistrée.'
-                );
-
-                return $this->redirectToRoute('app_customer', ['id' => $id, 'slug' => $slug]);
-
-            }
+            return $this->redirectToRoute('app_customer', [
+                'id' => $customer->getId(),
+                'slug' => $customer->getSlug(),
+            ]);
         }
 
         return $this->render('admin_main/contract_new.html.twig', [
@@ -174,25 +123,36 @@ class ContractController extends AbstractController
     }
 
     #[Route('/{id}/modifier-un-contrat', name: 'app_contract_edit')]
-    public function editContract(Request $request, $id): Response
+    public function editContract(Request $request, int $id): Response
     {
         $contract = $this->contractRepository->findOneById($id);
-        $customer = $contract->getCustomer();
-        $user = $customer->getUser();
-        $userId = $user->getId();
 
         if (!$contract) {
+            $this->addFlash(
+                'error',
+                'Le contrat n\'existe pas.'
+            );
+
             return $this->redirectToRoute('app_customer_list');
         }
 
-        $form = $this->createForm(EditContractType::class, $contract);
+        $customer = $contract->getCustomer();
+        $user = $customer->getUser();
 
-
+        $form = $this->createForm(ContractType::class, $contract);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->contractRepository->save($contract, true);
-            return $this->redirectToRoute('app_contract_show', array('id' => $id));
+
+            $this->addFlash(
+                'success',
+                'La modification du contrat est bien enregistrée.'
+            );
+
+            return $this->redirectToRoute('app_contract_show', [
+                'id' => $contract->getId(),
+            ]);
         }
 
         return $this->render('admin_main/contract_edit.html.twig', [
@@ -200,70 +160,139 @@ class ContractController extends AbstractController
             'form' => $form->createView(),
             'user' => $user,
             'customer' => $customer,
-            'id' => $userId
+            'id' => $user->getId(),
         ]);
     }
 
     #[Route('/{id}/supprimer', name: 'app_contract_remove', methods: ['POST'])]
     public function removeContract(Contract $contract, Request $request): Response
     {
-
         $customer = $contract->getCustomer();
+
         $customerId = $customer->getId();
         $customerSlug = $customer->getSlug();
-        $csrf_token = $request->request->get('_token', '');
 
-        if (!$this->isCsrfTokenValid('delete_contract' . $contract->getId(), $csrf_token)) {
+        $csrfToken = $request->request->get('_token', '');
 
+        if (!$this->isCsrfTokenValid('delete_contract'.$contract->getId(), $csrfToken)) {
             $this->addFlash(
                 'error',
                 'Vous ne pouvez pas supprimer cet élément.'
             );
-
         } else {
+            $this->contractRepository->remove($contract, true);
 
-                $this->contractRepository->remove($contract, true);
-                $this->addFlash(
-                    'success',
-                    'Le contrat à bien été supprimé.'
-                );
+            $this->addFlash(
+                'success',
+                'Le contrat a bien été supprimé.'
+            );
         }
 
-        return $this->redirectToRoute('app_customer', ['id' => $customerId, 'slug' => $customerSlug]);
-
+        return $this->redirectToRoute('app_customer', [
+            'id' => $customerId,
+            'slug' => $customerSlug,
+        ]);
     }
 
     #[Route('/{id}/supprimer-serp-info/{serpInfoId}', name: 'app_serp_info_remove', methods: ['POST'])]
-    #[ParamConverter('serpInfo', options: ['id' => 'serpInfoId'])]
-    public function removeSerpInfo(SerpInfo $serpInfo, Request $request, EntityManagerInterface $entityManager, PersistenceManagerRegistry $doctrine): Response
-    {
-
+    public function removeSerpInfo(
+        #[MapEntity(id: 'serpInfoId')] SerpInfo $serpInfo,
+        Request $request,
+    ): Response {
         $contract = $serpInfo->getContract();
         $contractId = $contract->getId();
-        $csrf_token = $request->request->get('_token', '');
 
-        if (!$this->isCsrfTokenValid('delete_serp_info' . $serpInfo->getId(), $csrf_token)) {
+        $csrfToken = $request->request->get('_token', '');
 
+        if (!$this->isCsrfTokenValid('delete_serp_info'.$serpInfo->getId(), $csrfToken)) {
             $this->addFlash(
                 'error',
                 'Vous ne pouvez pas supprimer cet élément.'
             );
-
         } else {
+            $this->entityManager->remove($serpInfo);
+            $this->entityManager->flush();
 
-            $entityManager = $doctrine->getManager();
-            $entityManager->remove($serpInfo);
-            $entityManager->flush(); // push les données
             $this->addFlash(
                 'success',
-                'Le mot clé à bien été supprimé.'
+                'Le mot clé a bien été supprimé.'
             );
         }
 
         return $this->redirectToRoute('app_contract_show', [
             'id' => $contractId,
         ]);
-
     }
 
+    private function handleSerpInfoForm(
+        FormInterface $serpInfoForm,
+        Contract $contract,
+    ): Response {
+        $newSerpInfo = new SerpInfo();
+        $newKeyword = $serpInfoForm->get('keyword')->getData();
+
+        $newSerpInfo->setKeyword($newKeyword);
+        $newSerpInfo->setContract($contract);
+
+        $this->entityManager->persist($newSerpInfo);
+        $this->entityManager->flush();
+
+        $this->addFlash(
+            'success',
+            'Mot clé enregistré avec succès.'
+        );
+
+        return $this->redirectToRoute('app_contract_show', [
+            'id' => $contract->getId(),
+        ]);
+    }
+
+    private function handleSerpResultForm(Contract $contract): Response
+    {
+        $newSerpResults = [];
+
+        foreach ($contract->getSerpInfos() as $serpInfo) {
+            $newRank = $this->googleSearchService->findWebsiteRank(
+                $serpInfo->getKeyword(),
+                $contract->getWebsiteLink()
+            );
+
+            if (null === $newRank) {
+                continue;
+            }
+
+            $newSerpResult = new SerpResult();
+            $newSerpResult->setGoogleRank($newRank);
+            $newSerpResult->setSerpInfo($serpInfo);
+            $newSerpResult->setDate(new \DateTime());
+
+            $newSerpResults[] = $newSerpResult;
+        }
+
+        if ([] === $newSerpResults) {
+            $this->addFlash(
+                'error',
+                'Le site n\'a été trouvé dans les résultats de recherche Google pour aucun des mots-clés.'
+            );
+
+            return $this->redirectToRoute('app_contract_show', [
+                'id' => $contract->getId(),
+            ]);
+        }
+
+        foreach ($newSerpResults as $newSerpResult) {
+            $this->entityManager->persist($newSerpResult);
+        }
+
+        $this->entityManager->flush();
+
+        $this->addFlash(
+            'success',
+            'Rangs enregistrés avec succès.'
+        );
+
+        return $this->redirectToRoute('app_contract_show', [
+            'id' => $contract->getId(),
+        ]);
+    }
 }

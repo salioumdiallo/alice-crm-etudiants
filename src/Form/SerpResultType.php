@@ -15,14 +15,14 @@ class SerpResultType extends AbstractType
     {
         $builder
             // hidden class => the data are already present on the webpage
-            ->add('googleRank', HiddenType::class) 
+            ->add('googleRank', HiddenType::class)
             ->add('SerpInfo', HiddenType::class)
             // submit class => save the JSON data in the DB
             ->add('submit', SubmitType::class, [
                 'label' => 'Enregistrer les résultats dans la base',
                 'attr' => [
                     'class' => 'btn btn-alice w-100',
-                ]
+                ],
             ])
         ;
     }

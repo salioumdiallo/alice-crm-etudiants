@@ -3,71 +3,132 @@
 {% block title %}Mes clients | Alice CRM{% endblock %}
 
 {% block body %}
-
-
     <div class="d-flex align-items-center justify-content-between mb-3">
         <h1>Liste des clients</h1>
-        <div class="button-go-back" alt="Retour page précédente" onclick="window.history.back();">
+
+        <div
+            class="button-go-back"
+            role="button"
+            tabindex="0"
+            aria-label="Retour à la page précédente"
+            onclick="window.history.back();"
+        >
             <i class="fa-sharp fa-solid fa-circle-chevron-left fa-2xl"></i>
         </div>
     </div>
 
     {% if customers is not empty %}
         <div class="d-flex flex-column align-items-center flex-lg-row justify-content-lg-end">
-            <p class="m-0 text-center">Pour ajouter un <strong>nouveau client</strong> vous devez lui créer un espace utilisateur :  </p>
-                <a href=" {{ path('app_user_add') }} " class="btn-fa-action-head-page ms-sm-3"><i class="fa-solid fa-user-plus fa-lg"></i></a>
+            <p class="m-0 text-center">
+                Pour ajouter un <strong>nouveau client</strong>, vous devez lui créer un espace utilisateur :
+            </p>
+
+            <a
+                href="{{ path('app_user_add') }}"
+                class="btn-fa-action-head-page ms-sm-3"
+                aria-label="Créer un nouvel utilisateur"
+            >
+                <i class="fa-solid fa-user-plus fa-lg"></i>
+            </a>
         </div>
 
         <div class="table-responsive mt-5">
-
             <table class="table">
+                <caption>Liste des clients</caption>
 
                 <thead>
                     <tr>
                         <th scope="col">Société</th>
                         <th scope="col">Utilisateur</th>
                         <th scope="col">Ville</th>
-                        <th scope="col">Client Pro</th>
+                        <th scope="col">Client pro</th>
                         <th scope="col">Partenaire</th>
                     </tr>
                 </thead>
 
-                {% for customer in customers %}
-
-                    <tbody>
+                <tbody>
+                    {% for customer in customers %}
                         <tr>
-                            <td><a href=" {{ path('app_customer', { 'id': customer.id, 'slug': customer.slug}) }} " class="hover-link fs-5">{{ customer.name|upper }}</a></td>
-                            <td><a href="{{ path('app_user_show', { 'id': customer.user.id, 'slug': customer.user.slug  }) }}" class="hover-link">{{ customer.user.firstname|capitalize }} {{ customer.user.lastname|upper }}</a></td>
-                            <td>{{ customer.city|upper }}</td>
-                            <td>{% if customer.isProfessional == true %}
-                                <p class="text-start m-0"><i class="fa-sharp fa-solid fa-circle-check fa-xl" style="color: #19374d;"></i></p>
-                            {% endif %}</td>
-                            <td>{% if customer.isPartner == true %}
-                                <p class="text-start m-0"><i class="fa-sharp fa-solid fa-circle-check fa-xl" style="color: #19374d;"></i></p>
-                            {% endif %}</td>
-                        </tr>
-                    </tbody>
+                            <td>
+                                <a
+                                    href="{{ path('app_customer', {'id': customer.id, 'slug': customer.slug}) }}"
+                                    class="hover-link fs-5"
+                                >
+                                    {{ customer.name|upper }}
+                                </a>
+                            </td>
 
-                {% endfor %} 
+                            <td>
+                                <a
+                                    href="{{ path('app_user_show', {'id': customer.user.id, 'slug': customer.user.slug}) }}"
+                                    class="hover-link"
+                                >
+                                    {{ customer.user.firstname|capitalize }}
+                                    {{ customer.user.lastname|upper }}
+                                </a>
+                            </td>
+
+                            <td>{{ customer.city|upper }}</td>
+
+                            <td>
+                                {% if customer.isProfessional == true %}
+                                    <p class="text-start m-0">
+                                        <i
+                                            class="fa-sharp fa-solid fa-circle-check fa-xl"
+                                            style="color: #19374d;"
+                                            aria-label="Client professionnel"
+                                        ></i>
+                                    </p>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if customer.isPartner == true %}
+                                    <p class="text-start m-0">
+                                        <i
+                                            class="fa-sharp fa-solid fa-circle-check fa-xl"
+                                            style="color: #19374d;"
+                                            aria-label="Partenaire"
+                                        ></i>
+                                    </p>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
             </table>
         </div>
     {% else %}
-        <h4 class="mb-5">Aucun Client</h4>
-        <p>Afin de créer une fiche client, veuillez vous rendre sur l'utilisateur correspondant :</p>
+        <h4 class="mb-5">Aucun client</h4>
+
+        <p>
+            Afin de créer une fiche client, veuillez vous rendre sur l'utilisateur correspondant :
+        </p>
+
         <div class="d-flex flex-column flex-md-row col-12 justify-content-around">
             <div class="card col-md-5 bgg-alice-light m-2">
                 <div class="d-flex flex-column align-items-center card-body justify-content-between">
-                    <h6 class="card-title mb-2">Souhaitez-vous attribuer le statut CLIENT à un utilisateur existant ?</h6>
-                    <a href="{{ path('app_user_list') }}" class="btn btn-alice">Utilisateurs</a>
+                    <h6 class="card-title mb-2">
+                        Souhaitez-vous attribuer le statut CLIENT à un utilisateur existant ?
+                    </h6>
+
+                    <a href="{{ path('app_user_list') }}" class="btn btn-alice">
+                        Utilisateurs
+                    </a>
                 </div>
             </div>
+
             <div class="card col-md-5 bgg-alice-light m-2">
                 <div class="d-flex flex-column align-items-center card-body justify-content-between">
-                    <h6 class="card-title mb-2">Ou souhaitez-vous créer un nouvel utilisateur ?</h6>
-                    <a href=" {{ path('app_user_add') }} " class="btn btn-alice">Nouveau</a>
+                    <h6 class="card-title mb-2">
+                        Ou souhaitez-vous créer un nouvel utilisateur ?
+                    </h6>
+
+                    <a href="{{ path('app_user_add') }}" class="btn btn-alice">
+                        Nouveau
+                    </a>
                 </div>
             </div>
         </div>
     {% endif %}
-
 {% endblock %}

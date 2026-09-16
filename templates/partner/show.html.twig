@@ -3,55 +3,103 @@
 {% block title %}Partenariat | Alice CRM{% endblock %}
 
 {% block body %}
-    
     <div class="d-flex align-items-center justify-content-between mb-3">
         <h1>Détail partenariat : {{ partner.name }}</h1>
-                <div class="button-go-back" alt="Retour page précédente" onclick="window.history.back();">
-            <i class="fa-sharp fa-solid fa-circle-chevron-left fa-2xl"></i>
+
+        <div
+            class="button-go-back"
+            role="button"
+            tabindex="0"
+            aria-label="Retour à la page précédente"
+            onclick="window.history.back();"
+        >
+            <i
+                class="fa-sharp fa-solid fa-circle-chevron-left fa-2xl"
+                aria-hidden="true"
+            ></i>
         </div>
     </div>
-    <div class="d-flex flex-column align-items-center flex-sm-row flex-sm-wrap mb-3 me-md-1 justify-content-center justify-content-lg-end">
-        <a href="{{ path('app_partner_edit', {'id': partner.id}) }}" class="btn btn-alice mx-2">Modifier</a>
-        {% if customers is empty %}
-                {{ include('partner/_delete_form.html.twig') }}
-        {% else %}
-        <span class="d-inline-block" data-bs-toggle="tooltip" data-bs-title="Suppression impossible du partenariat : {{ partner.name|upper }}. Veuillez retirer tous les clients bénéficiaires afin de le supprimer.">
-            <button class="btn btn-danger" type="button" disabled>Supprimer</button>
-        </span>
 
+    <div class="d-flex flex-column align-items-center flex-sm-row flex-sm-wrap mb-3 me-md-1 justify-content-center justify-content-lg-end">
+        <a
+            href="{{ path('app_partner_edit', {'id': partner.id}) }}"
+            class="btn btn-alice mx-2"
+        >
+            Modifier
+        </a>
+
+        {% if customers is empty %}
+            {{ include('partner/_delete_form.html.twig') }}
+        {% else %}
+            <span
+                class="d-inline-block"
+                data-bs-toggle="tooltip"
+                data-bs-title="Suppression impossible du partenariat : {{ partner.name|upper }}. Veuillez retirer tous les clients bénéficiaires afin de le supprimer."
+            >
+                <button
+                    class="btn btn-danger"
+                    type="button"
+                    disabled
+                >
+                    Supprimer
+                </button>
+            </span>
         {% endif %}
     </div>
 
-
     <table class="table">
+        <caption class="visually-hidden">
+            Informations du partenariat {{ partner.name }}
+        </caption>
+
         <tbody>
             <tr>
-                <th>Nom</th>
+                <th scope="row">Nom</th>
                 <td>{{ partner.name }}</td>
             </tr>
+
             <tr>
-                <th>Remise</th>
+                <th scope="row">Remise</th>
                 <td>{{ partner.discountRate }} %</td>
             </tr>
         </tbody>
     </table>
 
-<h1 class="mt-5">Liste des clients bénéficiant de ce partenariat</h1>
+    <h2 class="mt-5">
+        Liste des clients bénéficiant de ce partenariat
+    </h2>
+
     {% if customers is empty %}
-    <p>Aucun client</p>
+        <p>Aucun client</p>
     {% else %}
         <table class="table mt-5">
+            <caption class="visually-hidden">
+                Clients bénéficiant du partenariat {{ partner.name }}
+            </caption>
+
+            <thead>
+                <tr>
+                    <th scope="col">Nom</th>
+                </tr>
+            </thead>
+
             <tbody>
-                <tr>
-                    <th>Nom</th>
-                </tr>
                 {% for customer in customers %}
-                <tr>
-                    <td><a href="{{ path('app_customer', { 'id': customer.id, 'slug': customer.slug }) }}" class="hover-link">{{ customer.name }}</a></td>
-                </tr>
+                    <tr>
+                        <td>
+                            <a
+                                href="{{ path('app_customer', {
+                                    'id': customer.id,
+                                    'slug': customer.slug
+                                }) }}"
+                                class="hover-link"
+                            >
+                                {{ customer.name }}
+                            </a>
+                        </td>
+                    </tr>
                 {% endfor %}
             </tbody>
         </table>
     {% endif %}
-
 {% endblock %}

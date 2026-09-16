@@ -2,12 +2,11 @@
 
 namespace App\Entity;
 
-use App\Entity\User;
+use App\Repository\DocumentRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\DocumentRepository;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: DocumentRepository::class)]
 class Document
@@ -128,6 +127,4 @@ class Document
 
         return $this;
     }
-
-
 }

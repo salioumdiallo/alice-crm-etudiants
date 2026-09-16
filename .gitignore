@@ -1,4 +1,3 @@
-
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
@@ -7,7 +6,6 @@
 # /public/bundles/
 /var/
 /vendor/
-/migrations/
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###
@@ -28,6 +26,11 @@ uploads
 /public/bundles/fosckeditor/
 /MAQUETTAGE
 todo.txt
-/.env.test.idea/
-
+/.env.test
 .idea/
+###> friendsofphp/php-cs-fixer ###
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+###< friendsofphp/php-cs-fixer ###
+
+/.scannerwork/

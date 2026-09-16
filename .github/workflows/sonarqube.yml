@@ -2,8 +2,9 @@ name: SonarQube
 
 on:
   push:
-    branches: [main]
+    branches: [main, maintenance/security-quality-2026-09-16]
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -11,6 +12,7 @@ permissions:
 jobs:
   quality:
     runs-on: ubuntu-latest
+
     services:
       postgres:
         image: postgres:15-alpine
@@ -25,11 +27,14 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+
     env:
       APP_ENV: test
       APP_SECRET: test-secret-not-for-production
+
       # Doctrine adds the `_test` suffix in config/packages/doctrine.yaml.
       DATABASE_URL: postgresql://alice:alice_test@127.0.0.1:5432/alice?serverVersion=15&charset=utf8
+
       MAILER_DSN: null://null
       MESSENGER_TRANSPORT_DSN: sync://
       RECAPTCHA3_KEY: test
@@ -38,8 +43,10 @@ jobs:
       MJ_APIKEY_PRIVATE: test
       APP_GOOGLESEARCH_API_KEY: test
       GOOGLE_CUSTOM_SEARCH_API_KEY: test
+
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -52,10 +59,15 @@ jobs:
           php-version: '8.2'
           extensions: ctype, iconv, intl, pdo_pgsql
           coverage: pcov
-          tools: phpstan:1.12.32, php-cs-fixer:3.64.0
 
       - name: Prepare Symfony environment file
         run: cp .env.example .env
+
+      - name: Validate Composer configuration
+        run: composer validate --strict --no-check-publish
+
+      - name: Audit locked dependencies
+        run: composer audit --locked --no-interaction --abandoned=report
 
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
@@ -68,12 +80,11 @@ jobs:
           mkdir -p var/coverage
           vendor/bin/phpunit --coverage-clover var/coverage/clover.xml
 
-      - name: PHPStan diagnostic
-        run: phpstan analyse --configuration=phpstan.neon --no-progress
+      - name: PHPStan analysis
+        run: vendor/bin/phpstan analyse --configuration=phpstan.neon --no-progress
 
-      - name: PHP-CS-Fixer diagnostic
-        continue-on-error: true
-        run: php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --diff
+      - name: Check PHP code style
+        run: vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --diff
 
       - name: SonarQube scan
         if: env.SONAR_TOKEN != '' && env.SONAR_HOST_URL != ''

@@ -3,55 +3,87 @@
 {% block title %}Zone Tarifaire | Alice CRM{% endblock %}
 
 {% block body %}
-
-
     <div class="d-flex align-items-center justify-content-between mb-3">
         <h1>Zone Tarifaire</h1>
-                <div class="button-go-back" alt="Retour page précédente" onclick="window.history.back();">
-            <i class="fa-sharp fa-solid fa-circle-chevron-left fa-2xl"></i>
+
+        <div
+            class="button-go-back"
+            role="button"
+            tabindex="0"
+            aria-label="Retour à la page précédente"
+            onclick="window.history.back();"
+        >
+            <i
+                class="fa-sharp fa-solid fa-circle-chevron-left fa-2xl"
+                aria-hidden="true"
+            ></i>
         </div>
     </div>
-    
-    {% if tariff_zones is not empty %}
 
-        
+    {% if tariff_zones is not empty %}
         <div class="d-flex justify-content-center justify-content-lg-end">
-            <a href="{{ path('app_tariff_zone_new') }}" class="btn btn-alice">Nouvelle Zone</a>
+            <a
+                href="{{ path('app_tariff_zone_new') }}"
+                class="btn btn-alice"
+            >
+                Nouvelle Zone
+            </a>
         </div>
-       
+
         <table class="table mt-3">
+            <caption class="visually-hidden">
+                Liste des zones tarifaires
+            </caption>
+
             <thead>
                 <tr>
-                    
-                    <th>Nom</th>
-                    <th>Tarif</th>
-                    <th>Actions</th>
+                    <th scope="col">Nom</th>
+                    <th scope="col">Tarif</th>
+                    <th scope="col">Actions</th>
                 </tr>
             </thead>
+
             <tbody>
-            {% for tariff_zone in tariff_zones %}
-                <tr>
-                    
-                    <td>{{ tariff_zone.name }}</td>
-                    <td>{{ tariff_zone.amount }} €</td>
-                    <td>
-                        <div class="d-flex">
-                            <a href="{{ path('app_tariff_zone_show', {'id': tariff_zone.id}) }}" class="btn-fa-action-eye m-0"><i class="fa-solid fa-eye fa-xl"></i></a>
-                        </div>
-                    </td>
-                </tr>
-            {% endfor %}
+                {% for tariff_zone in tariff_zones %}
+                    <tr>
+                        <td>{{ tariff_zone.name }}</td>
+                        <td>{{ tariff_zone.amount }} €</td>
+                        <td>
+                            <div class="d-flex">
+                                <a
+                                    href="{{ path('app_tariff_zone_show', {'id': tariff_zone.id}) }}"
+                                    class="btn-fa-action-eye m-0"
+                                    aria-label="Afficher la zone tarifaire {{ tariff_zone.name }}"
+                                >
+                                    <i
+                                        class="fa-solid fa-eye fa-xl"
+                                        aria-hidden="true"
+                                    ></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
     {% else %}
         <h4 class="mb-5">Aucune Zone Tarifaire définie</h4>
-            <div class="d-flex flex-column flex-md-row col-12 justify-content-around">
-                <div class="card col-md-5 bgg-alice-light m-2">
-                    <div class="d-flex flex-column align-items-center card-body justify-content-between">
-                        <h6 class="card-title mb-2">Souhaitez-vous ajouter une zone tarifaire ?</h6>
-                        <a href="{{ path('app_tariff_zone_new') }}" class="btn btn-alice">Nouvelle Zone</a>
-                    </div>
+
+        <div class="d-flex flex-column flex-md-row col-12 justify-content-around">
+            <div class="card col-md-5 bgg-alice-light m-2">
+                <div class="d-flex flex-column align-items-center card-body justify-content-between">
+                    <h6 class="card-title mb-2">
+                        Souhaitez-vous ajouter une zone tarifaire ?
+                    </h6>
+
+                    <a
+                        href="{{ path('app_tariff_zone_new') }}"
+                        class="btn btn-alice"
+                    >
+                        Nouvelle Zone
+                    </a>
                 </div>
             </div>
+        </div>
     {% endif %}
 {% endblock %}

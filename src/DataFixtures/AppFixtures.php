@@ -3,8 +3,8 @@
 namespace App\DataFixtures;
 
 use App\Entity\User;
-use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
@@ -17,13 +17,13 @@ class AppFixtures extends Fixture
     }
 
     // ...
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $user = new User();
         $user->setFirstname('tiph')
         ->setLastname('ADMIN')
         ->setEmail('po@po.com')
-        ->setRoles(["ROLE_ADMIN"])
+        ->setRoles(['ROLE_ADMIN'])
         ->setIsVerified('1')
         ->setSlug('tiph-admin');
 
@@ -34,8 +34,5 @@ class AppFixtures extends Fixture
         $manager->flush();
 
         $this->addReference('user', $user);
-
     }
 }
-
-

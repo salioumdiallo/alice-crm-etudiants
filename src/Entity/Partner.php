@@ -26,7 +26,7 @@ class Partner
 
     public function __toString()
     {
-        return $this->getName().' : '.number_format(($this->getDiscountRate()) ,2,',',' ').' %';
+        return $this->getName().' : '.number_format($this->getDiscountRate(), 2, ',', ' ').' %';
     }
 
     public function __construct()

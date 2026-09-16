@@ -74,7 +74,7 @@
                 {% if app.user.roles[0] == "ROLE_ADMIN" %}
 
                     <li class="nav-item nav-item-alice">
-                        <a class="nav-link nav-link-alice col-12" target="_blank" href="https://calendar.google.com/calendar/u/0/r">
+                        <a class="nav-link nav-link-alice col-12" target="_blank" rel="noopener noreferrer" href="https://calendar.google.com/calendar/u/0/r">
                             <i class="fa-solid fa-calendar-days fa-xl col-2"></i>
                             <span class="col-10">Agenda</span>
                         </a>
@@ -85,7 +85,7 @@
                 <li class="nav-item nav-item-alice">
                     <a class="nav-link nav-link-alice col-12" href=" {{ path('app_logout') }} ">
                         <i class="fa-solid fa-right-from-bracket fa-xl col-2"></i>
-                        <span class="col-10">Déconnexion</span>
+                        <span class="col-10">DÃ©connexion</span>
                     </a>
                 </li>
 

@@ -33,7 +33,7 @@ class Customer
     #[ORM\Column]
     private ?bool $isPartner = null;
 
-    #[ORM\OneToOne(inversedBy: 'customer')]//, cascade: ['persist', 'remove']//)]
+    #[ORM\OneToOne(inversedBy: 'customer')] // , cascade: ['persist', 'remove']//)]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 

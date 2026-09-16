@@ -2,13 +2,13 @@
 
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Validator\Constraints\Email;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints\Email;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -43,6 +43,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'boolean')]
     private $is_verified = false;
 
+    /**
+     * @var Collection<int, Contact>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Contact::class)]
     private Collection $contacts;
 
@@ -50,23 +53,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?Customer $customer = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $role = null;
+    private ?string $status = null;
 
     #[ORM\Column(length: 255)]
     private ?string $slug = null;
 
+    /**
+     * @var Collection<int, Document>
+     */
     #[ORM\ManyToMany(targetEntity: Document::class, mappedBy: 'user')]
     private Collection $documents;
-
-    public function __toString()
-    {
-        return $this->getFirstname().' '.$this->getLastname();
-    }
 
     public function __construct()
     {
         $this->contacts = new ArrayCollection();
         $this->documents = new ArrayCollection();
+    }
+
+    public function __toString(): string
+    {
+        return $this->getFirstname().' '.$this->getLastname();
     }
 
     public function getId(): ?int
@@ -102,7 +108,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
+
+        // Guarantee every user at least has ROLE_USER.
         $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
@@ -117,9 +124,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @see PasswordAuthenticatedUserInterface
-     * @return string the hashed password for this user
      */
-    
     public function getPassword(): string
     {
         return $this->password;
@@ -135,10 +140,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @see UserInterface
      */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
+        // If you store any temporary, sensitive data on the user, clear it here.
     }
 
     public function getFirstname(): ?string
@@ -186,7 +190,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeContact(Contact $contact): self
     {
         if ($this->contacts->removeElement($contact)) {
-            // set the owning side to null (unless already changed)
             if ($contact->getUser() === $this) {
                 $contact->setUser(null);
             }
@@ -194,10 +197,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
-    /**
-     * @return bool
-     */
 
     public function getIsVerified(): ?bool
     {
@@ -218,7 +217,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setCustomer(Customer $customer): self
     {
-        // set the owning side of the relation if necessary
         if ($customer->getUser() !== $this) {
             $customer->setUser($this);
         }
@@ -228,14 +226,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getRole(): ?string
+    public function getStatus(): ?string
     {
-        return $this->role;
+        return $this->status;
     }
 
-    public function setRole(?string $role): self
+    public function setStatus(?string $status): self
     {
-        $this->role = $role;
+        $this->status = $status;
 
         return $this;
     }
@@ -278,7 +276,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
-
 }
-
