@@ -9,7 +9,7 @@
             <i class="fa-sharp fa-solid fa-circle-chevron-left fa-2xl"></i>
         </div>
     </div>
-    
+
     <div class="d-flex my-2 me-md-1 justify-content-end d-lg-flex">
 
         <a href="{{ path('app_contract_edit', { 'id': contract.id }) }}" class="btn-fa-action-head-page mx-2"><i class="fa-solid fa-pen-to-square fa-xl"></i></a>
@@ -112,10 +112,9 @@
         <h3>Référencement par mots-clés</h3>
     </div>
         {% for serpInfo in serpInfos %}
-            <div class="row keyword-container d-flex flex-row mb-2 align-items-center" 
-                    data-keyword="{{ serpInfo.id }}" 
-                    data-google-api-key="{{ googleApiKey }}" 
-                    data-google-custom-api-key="{{ googleCustomApiKey }}">
+            <div class="row keyword-container d-flex flex-row mb-2 align-items-center"
+                    data-keyword="{{ serpInfo.id }}"
+                   >
                 <form method="post" action="{{ path('app_serp_info_remove', { 'id': contract.id, 'serpInfoId': serpInfo.id }) }}" class="col-3 offset-1 col-md-1 offset-md-1" onsubmit="return confirm('Supprimer ce mot-clé ?');">
                     <input type="hidden" name="_token" value="{{ csrf_token('delete_serp_info' ~ serpInfo.id) }}">
                     <button type="submit" class="btn btn-block btn-sm btn-outline-danger" id="btn-sup-keyword">X</button>

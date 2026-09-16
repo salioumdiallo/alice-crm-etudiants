@@ -13,7 +13,7 @@ use App\Repository\ContractRepository;
 use App\Repository\CustomerRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\HttpClient\HttpClient;
+use App\Service\GoogleSearchService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -29,12 +29,18 @@ class ContractController extends AbstractController
     private $entityManager;
     private $contractRepository;
     private $customerRepository;
+    private $googleSearchService;
 
-    public function __construct(EntityManagerInterface $entityManager, ContractRepository $contractRepository, CustomerRepository $customerRepository)
-    {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        ContractRepository $contractRepository,
+        CustomerRepository $customerRepository,
+        GoogleSearchService $googleSearchService
+    ) {
         $this->entityManager = $entityManager;
         $this->contractRepository = $contractRepository;
         $this->customerRepository = $customerRepository;
+        $this->googleSearchService = $googleSearchService;
     }
 
     #[Route('/', name: 'app_contract_list')]
@@ -52,8 +58,6 @@ class ContractController extends AbstractController
     {
         $contract = $this->contractRepository->findOneById($id);
         $serpInfos = $contract->getSerpInfos();
-        $googleApiKey = $this->getParameter('app.googlesearch.api_key');
-        $googleCustomApiKey = $this->getParameter('app.googlecustomsearch.api_key');
 
         $serpInfoForm=$this->createForm(SerpInfoType::class);
         $serpInfoForm->handleRequest($request);
@@ -83,19 +87,10 @@ class ContractController extends AbstractController
             foreach ($serpInfos as $serpInfo) {
                 $newSerpResult = new SerpResult();
                 $keyword = $serpInfo->getKeyword();
-                $url = 'https://www.googleapis.com/customsearch/v1?key=' . $googleApiKey . '&cx=' . $googleCustomApiKey . '&q=' . urlencode($keyword);
-                $response = HttpClient::create()->request('GET', $url);
-                $content = json_decode($response->getContent());
-                $newRank = null;
-
-                if (isset($content->items)) {
-                    foreach ($content->items as $index => $item) {
-                        if (stripos($item->link, $contract->getWebsiteLink()) !== false) {
-                            $newRank = $index + 1;
-                            break;
-                        }
-                    }
-                }
+               $newRank = $this->googleSearchService->findWebsiteRank(
+                   $keyword,
+                   $contract->getWebsiteLink()
+               );
 
                 if ($newRank) {
                     $newSerpResult->setGoogleRank($newRank);
@@ -127,8 +122,6 @@ class ContractController extends AbstractController
             'serpInfoForm' => $serpInfoForm->createView(),
             'contract' => $contract,
             'serpInfos' => $serpInfos,
-            'googleApiKey' => $googleApiKey,
-            'googleCustomApiKey' => $googleCustomApiKey,
             'serpResultForm' => $serpResultForm->createView()
         ]);
     }
@@ -137,6 +130,7 @@ class ContractController extends AbstractController
     public function createContract(Request $request, $id): Response
     {
         $customer = $this->customerRepository->findOneById($id);
+
         $slug = $customer->getSlug();
 
         $contract = new Contract;

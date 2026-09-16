@@ -10,7 +10,6 @@ parameters:
     app.googlesearch.api_key: '%env(APP_GOOGLESEARCH_API_KEY)%'
     app.googlecustomsearch.api_key: '%env(GOOGLE_CUSTOM_SEARCH_API_KEY)%'
 
-
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -25,6 +24,12 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+
+    # Google Custom Search service
+    App\Service\GoogleSearchService:
+        arguments:
+            $googleApiKey: '%app.googlesearch.api_key%'
+            $googleCustomSearchApiKey: '%app.googlecustomsearch.api_key%'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
