@@ -27,7 +27,7 @@ class TariffZone
 
     public function __toString()
     {
-        return $this->getName().' : '.number_format(($this->getAmount()) ,2,',',' ').' €';
+        return $this->getName().' : '.number_format($this->getAmount(), 2, ',', ' ').' €';
     }
 
     public function __construct()

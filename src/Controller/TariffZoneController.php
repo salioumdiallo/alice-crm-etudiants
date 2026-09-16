@@ -5,10 +5,10 @@ namespace App\Controller;
 use App\Entity\TariffZone;
 use App\Form\TariffZoneType;
 use App\Repository\TariffZoneRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/admin/tariff_zone')]
 class TariffZoneController extends AbstractController
@@ -19,7 +19,7 @@ class TariffZoneController extends AbstractController
     {
         $this->tariffZoneRepository = $tariffZoneRepository;
     }
-    
+
     #[Route('/', name: 'app_tariff_zone_list', methods: ['GET'])]
     public function list(): Response
     {
@@ -41,13 +41,14 @@ class TariffZoneController extends AbstractController
                 'success',
                 'La création de la nouvelle zone tarifaire est bien enregistrée.'
             );
+
             return $this->redirectToRoute('app_tariff_zone_list', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('tariff_zone/new.html.twig', [
             'tariff_zone' => $tariffZone,
             'form' => $form,
-            'flash' => $this
+            'flash' => $this,
         ]);
     }
 
@@ -90,7 +91,7 @@ class TariffZoneController extends AbstractController
     {
         if ($this->isCsrfTokenValid('delete_tariffZone'.$tariffZone->getId(), $request->request->get('_token'))) {
             $this->tariffZoneRepository->remove($tariffZone, true);
-            
+
             $this->addFlash(
                 'success',
                 'La zone tarifaire à bien été supprimée.'
@@ -100,9 +101,9 @@ class TariffZoneController extends AbstractController
                 'alert',
                 'Une erreur est survenue.',
             );
+
             return $this->redirectToRoute('app_tariff_zone_list', [], Response::HTTP_SEE_OTHER);
         }
-
 
         return $this->redirectToRoute('app_tariff_zone_list', [], Response::HTTP_SEE_OTHER);
     }

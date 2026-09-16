@@ -24,7 +24,7 @@ class DynamicContentController extends AbstractController
         string $name,
         ManagerRegistry $doctrine,
         Request $request,
-        #[MapEntity(mapping: ['id' => 'id', 'slug' => 'slug'])] Customer $customer
+        #[MapEntity(mapping: ['id' => 'id', 'slug' => 'slug'])] Customer $customer,
     ): Response {
         $dynamicContentRepository = $doctrine->getRepository(DynamicContent::class);
 

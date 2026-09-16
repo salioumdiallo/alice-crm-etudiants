@@ -3,14 +3,14 @@
 namespace App\Form;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints\Regex;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Regex;
 
 class ChangePasswordFormType extends AbstractType
 {
@@ -28,19 +28,19 @@ class ChangePasswordFormType extends AbstractType
                     'constraints' => [
                         // longueure min 8 max 20
                         new Length([
-                            'min' => 8, 
+                            'min' => 8,
                             'max' => 20,
                             'minMessage' => 'Le mot depasse doit contenir au moins 8 caractères',
-                            'maxMessage' => 'Le mot depasse doit contenir moins de 20 caractères' 
+                            'maxMessage' => 'Le mot depasse doit contenir moins de 20 caractères',
                         ]),
                         // invalide si null
                         new NotBlank([
-                            'message' => 'Veuillez renseigner un mot de passe !'
+                            'message' => 'Veuillez renseigner un mot de passe !',
                         ]),
-                        // Oblige à entrer un MDP avec 8 à 20 char + 1 maj + 1 min + chiffre + caractere spé 
+                        // Oblige à entrer un MDP avec 8 à 20 char + 1 maj + 1 min + chiffre + caractere spé
                         new Regex([
                             'pattern' => '/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,20}$/',
-                            'message' => 'Votre mot de passe doit contenir 1 majuscule, 1 minuscule, 1 caractère spécial, 1 chiffre et doit être composé de 8 à 20 caractères'
+                            'message' => 'Votre mot de passe doit contenir 1 majuscule, 1 minuscule, 1 caractère spécial, 1 chiffre et doit être composé de 8 à 20 caractères',
                         ]),
                     ],
                     'label' => 'Nouveau mot de passe',
@@ -56,8 +56,8 @@ class ChangePasswordFormType extends AbstractType
             ->add('submit', SubmitType::class, [
                 'label' => 'Réinitialisez votre mot de passe',
                 'attr' => [
-                    'class' => 'btn-alice-form'
-                ]
+                    'class' => 'btn-alice-form',
+                ],
             ])
         ;
     }

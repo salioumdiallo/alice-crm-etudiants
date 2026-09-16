@@ -31,7 +31,7 @@ final class DocumentVoter extends Voter
             return true;
         }
 
-        if ($attribute !== self::VIEW) {
+        if (self::VIEW !== $attribute) {
             return false;
         }
 

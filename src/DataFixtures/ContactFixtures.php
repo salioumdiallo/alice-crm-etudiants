@@ -2,11 +2,11 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\User;
 use App\Entity\Contact;
-use libphonenumber\PhoneNumberUtil;
-use Doctrine\Persistence\ObjectManager;
+use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Persistence\ObjectManager;
+use libphonenumber\PhoneNumberUtil;
 
 class ContactFixtures extends Fixture
 {
@@ -16,7 +16,6 @@ class ContactFixtures extends Fixture
         $phoneNumber = $phoneNumberUtil->parse('+33658745896', 'FR');
 
         $user = $this->getReference('user', User::class);
-
 
         // $product = new Product();
         $contact = new Contact();

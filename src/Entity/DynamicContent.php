@@ -47,5 +47,4 @@ class DynamicContent
 
         return $this;
     }
-
 }

@@ -23,7 +23,7 @@ class UserController extends AbstractController
     public function __construct(
         private UserRepository $userRepository,
         private CustomerRepository $customerRepository,
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -42,7 +42,7 @@ class UserController extends AbstractController
     #[Route('/utilisateur/{id}/{slug}', name: 'app_user_show')]
     public function showUser(
         #[MapEntity(mapping: ['id' => 'id', 'slug' => 'slug'])] User $user,
-        string $slug
+        string $slug,
     ): Response {
         if ($user->getSlug() !== $slug) {
             $this->addFlash(
@@ -68,7 +68,7 @@ class UserController extends AbstractController
     public function addUser(
         Request $request,
         ManagerRegistry $doctrine,
-        UserPasswordHasherInterface $passwordHasher
+        UserPasswordHasherInterface $passwordHasher,
     ): Response {
         $user = new User();
 
@@ -124,7 +124,7 @@ class UserController extends AbstractController
         int $id,
         string $slug,
         ManagerRegistry $doctrine,
-        #[MapEntity(mapping: ['id' => 'id', 'slug' => 'slug'])] User $user
+        #[MapEntity(mapping: ['id' => 'id', 'slug' => 'slug'])] User $user,
     ): Response {
         $form = $this->createForm(EditUserType::class, $user);
         $form->handleRequest($request);

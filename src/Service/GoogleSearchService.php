@@ -9,7 +9,7 @@ class GoogleSearchService
     public function __construct(
         private HttpClientInterface $httpClient,
         private string $googleApiKey,
-        private string $googleCustomSearchApiKey
+        private string $googleCustomSearchApiKey,
     ) {
     }
 
@@ -32,7 +32,7 @@ class GoogleSearchService
         foreach ($content['items'] ?? [] as $index => $item) {
             if (
                 isset($item['link'])
-                && stripos($item['link'], $websiteLink) !== false
+                && false !== stripos($item['link'], $websiteLink)
             ) {
                 return $index + 1;
             }

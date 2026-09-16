@@ -15,10 +15,10 @@ class UserUnitTest extends TestCase
             ->setEmail('true@test.com')
             ->setFirstname('prenom')
             ->setLastname('nom');
-        
-        $this->assertTrue($user->getEmail() === 'true@test.com');
-        $this->assertTrue($user->getFirstname() === 'prenom');
-        $this->assertTrue($user->getLastname() === 'nom');
+
+        $this->assertTrue('true@test.com' === $user->getEmail());
+        $this->assertTrue('prenom' === $user->getFirstname());
+        $this->assertTrue('nom' === $user->getLastname());
     }
 
     public function testIsFalse()
@@ -29,10 +29,10 @@ class UserUnitTest extends TestCase
             ->setEmail('true@test.com')
             ->setFirstname('prenom')
             ->setLastname('nom');
-        
-        $this->assertFalse($user->getEmail() === 'false@test.com');
-        $this->assertFalse($user->getFirstname() === 'false');
-        $this->assertFalse($user->getLastname() === 'false');
+
+        $this->assertFalse('false@test.com' === $user->getEmail());
+        $this->assertFalse('false' === $user->getFirstname());
+        $this->assertFalse('false' === $user->getLastname());
     }
 
     public function testIsEmpty()

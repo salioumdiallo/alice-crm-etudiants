@@ -26,18 +26,16 @@ class SerpInfoType extends AbstractType
                         'min' => 2,
                         'max' => 400,
                         'minMessage' => 'Votre mot clé contient moins de {limit} lettres ?',
-                        'maxMessage' => 'Votre mot clé doit contenir moins de {limit} lettres !'
-                    ])
+                        'maxMessage' => 'Votre mot clé doit contenir moins de {limit} lettres !',
+                    ]),
                 ],
             ])
 
             ->add('save', SubmitType::class, [
-            'label_html' => true,
-            'label' => 'Ajouter',
-            'attr' => [
-                'class' => 'btn btn-outline-primary',]]);
-            ;
-        ;
+                'label_html' => true,
+                'label' => 'Ajouter',
+                'attr' => [
+                    'class' => 'btn btn-outline-primary', ]]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

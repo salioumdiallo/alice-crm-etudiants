@@ -5,13 +5,10 @@ namespace App\Form;
 use App\Entity\DynamicContent;
 use FOS\CKEditorBundle\Form\Type\CKEditorType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 class DynamicContentType extends AbstractType
 {
@@ -25,19 +22,17 @@ class DynamicContentType extends AbstractType
                 'constraints' => [
                     new Length([
                         'max' => 50000,
-                        'maxMessage' => 'The content cannot contain more than {{ limit }} characters'
+                        'maxMessage' => 'The content cannot contain more than {{ limit }} characters',
                     ]),
-                ]
+                ],
             ])
-
 
             ->add('save', SubmitType::class, [
                 'label' => 'Publier',
                 'attr' => [
-                    'class' => 'btn btn-alice-lg col-12'
-                ]
+                    'class' => 'btn btn-alice-lg col-12',
+                ],
             ]);
-
     }
 
     public function configureOptions(OptionsResolver $resolver): void
