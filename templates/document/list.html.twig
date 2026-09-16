@@ -8,7 +8,9 @@
 
         <div
             class="button-go-back"
-            alt="Retour page précédente"
+            role="button"
+            tabindex="0"
+            aria-label="Retour à la page précédente"
             onclick="window.history.back();"
         >
             <i class="fa-sharp fa-solid fa-circle-chevron-left fa-2xl"></i>
@@ -19,37 +21,52 @@
         <a
             href="{{ path('app_document_new') }}"
             class="btn-fa-action-head-page"
+            aria-label="Ajouter un document"
         >
             <i class="fa-solid fa-file-circle-plus fa-xl"></i>
         </a>
     </div>
 
     <table class="table">
+        <caption class="visually-hidden">
+            Liste des documents
+        </caption>
+
         <thead>
             <tr>
                 {# Sorting of properties based on query components #}
 
                 {% if app.user.roles[0] == 'ROLE_ADMIN' %}
-                    <th class="d-none d-sm-table-cell">Utilisateur</th>
+                    <th scope="col" class="d-none d-sm-table-cell">
+                        Utilisateur
+                    </th>
                 {% endif %}
 
-                <th {% if pagination.isSorted('d.name') %}class="sorted"{% endif %}>
+                <th
+                    scope="col"
+                    {% if pagination.isSorted('d.name') %}class="sorted"{% endif %}
+                >
                     {{ knp_pagination_sortable(pagination, 'Titre', 'd.name') }}
                 </th>
 
-                <th class="d-none d-sm-table-cell">
+                <th scope="col" class="d-none d-sm-table-cell">
                     Description
                 </th>
 
-                <th>
+                <th scope="col">
                     {{ knp_pagination_sortable(pagination, 'Date', 'd.date') }}
                 </th>
 
-                <th {% if pagination.isSorted('d.family') %}class="sorted"{% endif %}>
+                <th
+                    scope="col"
+                    {% if pagination.isSorted('d.family') %}class="sorted"{% endif %}
+                >
                     {{ knp_pagination_sortable(pagination, 'Famille', 'd.family') }}
                 </th>
 
-                <th>Actions</th>
+                <th scope="col">
+                    Actions
+                </th>
             </tr>
         </thead>
 
@@ -113,6 +130,7 @@
                             <a
                                 href="{{ path('app_document_show', {'id': document.id}) }}"
                                 class="btn-fa-action-eye m-0 mx-2"
+                                aria-label="Afficher le document {{ document.name }}"
                             >
                                 <i class="fa-solid fa-eye fa-xl"></i>
                             </a>
@@ -123,6 +141,7 @@
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 download
+                                aria-label="Télécharger le document {{ document.name }}"
                             >
                                 <i class="fa-solid fa-download fa-xl"></i>
                             </a>
@@ -131,7 +150,9 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="7">Aucun document</td>
+                    <td colspan="{{ app.user.roles[0] == 'ROLE_ADMIN' ? 6 : 5 }}">
+                        Aucun document
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>

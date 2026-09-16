@@ -2,190 +2,273 @@
 
 {% block title %}Accueil | Alice CRM{% endblock %}
 
-
-
 {% block body %}
-
-{# Page accueil #}
-
+    {# Page accueil #}
 
     <div class="d-flex align-items-center justify-content-between mb-3">
         <h1>Bonjour {{ app.user.firstname|capitalize }}.</h1>
     </div>
 
-
-<div class="d-flex flex-column align-items-center flex-sm-row flex-sm-wrap mb-3 me-md-1 justify-content-center justify-content-lg-end d-none d-lg-flex">
-    {% if app.user.roles[0] == "ROLE_USER" %}
-        <a href="mailto:alice.webdeveloppement@gmail.com?subject=Question de {{ app.user }}" class="btn btn-alice mx-2" >Écrire à Antoine</a>
-    {% endif %}
-</div>
-
-<div class="row">
-
-    {% if app.user.roles[0] == "ROLE_ADMIN" %}
-
-        {# Google Calendar #}
-        <div class="my-5  col-12 col-lg-6">
-
-            <div class="d-flex flex-wrap flex-column">
-                <div class="bg-alice-light d-flex align-items-center justify-content-center container-calendar-title">
-                    <p class="calendar-title">Agenda</p>
-                </div>
-
-                {# direct link to google calendar  #}
-                <iframe src="https://calendar.google.com/calendar/embed?src=fr.french%23holiday%40group.v.calendar.google.com&ctz=Europe%2FParis" style="border: 0" width="800" height="600" frameborder="0" scrolling="no"></iframe>
-
-            </div>
-        
-        </div>
-    {% endif %}
-
-    {# Documents #}
-
-    <div class="d-flex flex-wrap flex-column col-12 col-lg-6">
-        <div class="table-responsive my-5">
-            <table class="table">
-                <thead class="bg-alice-light border-alice-doc">
-                    <tr>
-                        <th scope="col" colspan="2" class="text-center">
-                            <a href="{{ path('app_document_list') }}" class="fs-4 fw-normal hover-link" data-bs-toggle="tooltip" data-bs-title="Tous les documents">Documents</a>
-                        </th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                {% if pagination.items == null %}
-                        <tr class="border-alice-doc">
-                                {# align-middle on y #}
-                            <td class="col-1 align-middle">Aucun document</td>
-                            <td class="col-1"><a href="{{ path('app_document_new') }}" class="btn btn-alice">Ajouter</a></td>
-
-                        </tr>
-
-                {% endif %}
-                    {% for document in pagination %}
-                        <tr class="border-alice-doc">
-                                
-                            <td scope="col-1">{{ document.date ? document.date|date('d/m/Y') : '' }}</td>
-                            <td scope="col-1"><a href="{{ path('app_document_show', {'id': document.id}) }}" class="hover-link">{{ document.name }}</a></td>
-
-                        </tr>
-                    {% endfor %}
-
-                </tbody>
-            </table>
-        </div>
+    <div class="d-flex flex-column align-items-center flex-sm-row flex-sm-wrap mb-3 me-md-1 justify-content-center justify-content-lg-end d-none d-lg-flex">
+        {% if app.user.roles[0] == 'ROLE_USER' %}
+            <a
+                href="mailto:alice.webdeveloppement@gmail.com?subject=Question de {{ app.user }}"
+                class="btn btn-alice mx-2"
+            >
+                Écrire à Antoine
+            </a>
+        {% endif %}
     </div>
 
+    <div class="row">
+        {% if app.user.roles[0] == 'ROLE_ADMIN' %}
+            {# Google Calendar #}
+            <div class="my-5 col-12 col-lg-6">
+                <div class="d-flex flex-wrap flex-column">
+                    <div class="bg-alice-light d-flex align-items-center justify-content-center container-calendar-title">
+                        <p class="calendar-title">Agenda</p>
+                    </div>
 
-        {# Contact du User #}
-
-{% if app.user.roles[0] == "ROLE_USER" %}
-
-    
-    <div class="col-12 col-lg-6">
-        <div class="d-flex flex-wrap flex-column my-5">
-            <div class="head-table-contact d-flex align-items-center justify-content-center p-2 h-25">
-                <a href="{{ path('app_contacts_user') }}" class="fs-4 hover-link">Mes contacts</a>
+                    <iframe
+                        src="https://calendar.google.com/calendar/embed?src=fr.french%23holiday%40group.v.calendar.google.com&ctz=Europe%2FParis"
+                        title="Agenda des jours fériés en France"
+                        style="border: 0"
+                        width="800"
+                        height="600"
+                        frameborder="0"
+                        scrolling="no"
+                    ></iframe>
+                </div>
             </div>
-            
-                {% if contacts.count() > 0 %}
-                    <div>
-                        {% for contact in contacts %}
-                        
+        {% endif %}
 
-                            <div class="d-flex flex-column p-0 col-12 contact-home-page">
+        {# Documents #}
+        <div class="d-flex flex-wrap flex-column col-12 col-lg-6">
+            <div class="table-responsive my-5">
+                <table class="table">
+                    <caption class="visually-hidden">
+                        Documents récents
+                    </caption>
 
-                                <table class="table mb-0" data-name="tableContact">
+                    <thead class="bg-alice-light border-alice-doc">
+                        <tr>
+                            <th
+                                scope="col"
+                                colspan="2"
+                                class="text-center"
+                            >
+                                <a
+                                    href="{{ path('app_document_list') }}"
+                                    class="fs-4 fw-normal hover-link"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-title="Tous les documents"
+                                >
+                                    Documents
+                                </a>
+                            </th>
+                        </tr>
 
+                        <tr class="visually-hidden">
+                            <th scope="col">Date</th>
+                            <th scope="col">Document</th>
+                        </tr>
+                    </thead>
 
+                    <tbody>
+                        {% if pagination.items == null %}
+                            <tr class="border-alice-doc">
+                                <td>Aucun document</td>
+                                <td>
+                                    <a
+                                        href="{{ path('app_document_new') }}"
+                                        class="btn btn-alice"
+                                    >
+                                        Ajouter
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endif %}
+
+                        {% for document in pagination %}
+                            <tr class="border-alice-doc">
+                                <td>
+                                    {{ document.date ? document.date|date('d/m/Y') : '' }}
+                                </td>
+                                <td>
+                                    <a
+                                        href="{{ path('app_document_show', {'id': document.id}) }}"
+                                        class="hover-link"
+                                    >
+                                        {{ document.name }}
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {# Contacts du User #}
+        {% if app.user.roles[0] == 'ROLE_USER' %}
+            <div class="col-12 col-lg-6">
+                <div class="d-flex flex-wrap flex-column my-5">
+                    <div class="head-table-contact d-flex align-items-center justify-content-center p-2 h-25">
+                        <a
+                            href="{{ path('app_contacts_user') }}"
+                            class="fs-4 hover-link"
+                        >
+                            Mes contacts
+                        </a>
+                    </div>
+
+                    {% if contacts.count() > 0 %}
+                        <div>
+                            {% for contact in contacts %}
+                                <div class="d-flex flex-column p-0 col-12 contact-home-page">
                                     <div class="d-flex justify-content-between">
                                         <div class="d-flex align-items-baseline col-10">
-                                            <p class="m-0 py-1 ps-1 fs-6 fw-medium col-5 text-start">{{ contact.firstname|capitalize }} {{ contact.lastname|upper }}</p>
-                                            <p class="p-0 m-0 fs-6 fst-italic col-4 text-start">{{ contact.position }}</p>
-                                                {% if contact.isMain == true %}
-                                                <p class="p-0 m-0 fs-6 fst-italic col-3 text-start">Principal</p>
-                                                {% endif %}
-                                        </div>
-                                        <div data-name="button-control-view-div-contact" class="d-flex">
-                                                <div class="my-auto mx-1 btn-fa-plus-minus" data-name="img-show-detail-contact">
-                                                    <i class="fa-solid fa-circle-plus fa-xl"></i>
-                                                </div>
+                                            <p class="m-0 py-1 ps-1 fs-6 fw-medium col-5 text-start">
+                                                {{ contact.firstname|capitalize }}
+                                                {{ contact.lastname|upper }}
+                                            </p>
 
-                                                <div class="my-auto mx-1 btn-fa-plus-minus" data-name="img-hide-contact-detail" style="display:none;">
-                                                    <i class="fa-solid fa-circle-minus fa-xl"></i>
-                                                </div>
+                                            <p class="p-0 m-0 fs-6 fst-italic col-4 text-start">
+                                                {{ contact.position }}
+                                            </p>
+
+                                            {% if contact.isMain == true %}
+                                                <p class="p-0 m-0 fs-6 fst-italic col-3 text-start">
+                                                    Principal
+                                                </p>
+                                            {% endif %}
                                         </div>
 
+                                        <div
+                                            data-name="button-control-view-div-contact"
+                                            class="d-flex"
+                                        >
+                                            <div
+                                                class="my-auto mx-1 btn-fa-plus-minus"
+                                                data-name="img-show-detail-contact"
+                                            >
+                                                <i
+                                                    class="fa-solid fa-circle-plus fa-xl"
+                                                    aria-hidden="true"
+                                                ></i>
+                                            </div>
+
+                                            <div
+                                                class="my-auto mx-1 btn-fa-plus-minus"
+                                                data-name="img-hide-contact-detail"
+                                                style="display:none;"
+                                            >
+                                                <i
+                                                    class="fa-solid fa-circle-minus fa-xl"
+                                                    aria-hidden="true"
+                                                ></i>
+                                            </div>
+                                        </div>
                                     </div>
 
+                                    <table
+                                        class="table mb-0"
+                                        data-name="tableContact"
+                                    >
+                                        <caption class="visually-hidden">
+                                            Coordonnées de {{ contact.firstname }}
+                                            {{ contact.lastname }}
+                                        </caption>
 
-                                    <tbody>
+                                        <tbody>
                                             <tr>
-                                                <td>Email</td>
-                                                <td class="overflow-x-hidden"> 
+                                                <th scope="row">Email</th>
+                                                <td class="overflow-x-hidden">
                                                     <b>
-                                                        <a href="mailto:{{ contact.email }}" class="hover-link">{{ contact.email }}</a>
+                                                        <a
+                                                            href="mailto:{{ contact.email }}"
+                                                            class="hover-link"
+                                                        >
+                                                            {{ contact.email }}
+                                                        </a>
                                                     </b>
                                                 </td>
                                             </tr>
+
                                             <tr>
-                                                <td>Tel</td>
-                                                <td class=" fw-medium">{{ contact.phone|phone_number_format('INTERNATIONAL') }}</td>
+                                                <th scope="row">Tel</th>
+                                                <td class="fw-medium">
+                                                    {{ contact.phone|phone_number_format('INTERNATIONAL') }}
+                                                </td>
                                             </tr>
-                                    </tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="d-flex flex-column p-0 col-12 contact-home-page">
+                            <table class="table mb-0">
+                                <caption class="visually-hidden">
+                                    Contacts
+                                </caption>
 
-                                </table>
-                            </div>
-
-                        
-                    {% endfor %}
-                    </div>
-                {% else %}
-                <div class="d-flex flex-column p-0 col-12 contact-home-page">
-                    <table class="table mb-0">
-                        <tr>
-                                
-                            <td class="col-6 align-middle">Aucun contact</td>
-                            <td class="col-6"><a href="{{ path('app_contact_user_add') }}" class="btn btn-alice">Ajouter</a></td>
-
-                        </tr>
-                    </table>
+                                <tbody>
+                                    <tr>
+                                        <th scope="row" class="col-6 align-middle">
+                                            Aucun contact
+                                        </th>
+                                        <td class="col-6">
+                                            <a
+                                                href="{{ path('app_contact_user_add') }}"
+                                                class="btn btn-alice"
+                                            >
+                                                Ajouter
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
                 </div>
-                {% endif %}
-        </div>
-    </div>
-{% endif %}
+            </div>
+        {% endif %}
 
-        
-        {% if app.user.roles[0] == "ROLE_ADMIN" %}
-        {# Fonctionnalité Graphique #}
-            {# <div class="my-auto bg-success">
+        {% if app.user.roles[0] == 'ROLE_ADMIN' %}
+            {# Fonctionnalité Graphique #}
+            {#
+            <div class="my-auto bg-success">
                 <p class="fs-3">Statistiques</p>
                 <div id="graphic" class="col-12 bg-success-subtle">
-                    <canvas class="mb-3 border" id="myChart" width="900" height="380"></canvas>
+                    <canvas
+                        class="mb-3 border"
+                        id="myChart"
+                        width="900"
+                        height="380"
+                    ></canvas>
                 </div>
-            </div> #}
+            </div>
+            #}
 
-        {# Affichage du tableau des stats #}
-            {# <div class="my-auto bg-info">
+            {# Affichage du tableau des stats #}
+            {#
+            <div class="my-auto bg-info">
                 <p class="fs-3 text-center">Analyse Financière</p>
-                <div id="statistics" class="col-12 bg-info-subtle">
-                </div>
-            </div> #}
+                <div id="statistics" class="col-12 bg-info-subtle"></div>
+            </div>
+            #}
         {% endif %}
 
-    <div class="d-flex flex-column align-items-center flex-sm-row flex-sm-wrap mb-5 me-md-1 justify-content-center justify-content-lg-end d-lg-none">
-        {% if app.user.roles[0] == "ROLE_USER" %}
-            <a href="mailto:alice.webdeveloppement@gmail.com?subject=Question de {{ app.user }}" class="btn btn-alice mx-2" >Écrire à Antoine</a>
-        {% endif %}
+        <div class="d-flex flex-column align-items-center flex-sm-row flex-sm-wrap mb-5 me-md-1 justify-content-center justify-content-lg-end d-lg-none">
+            {% if app.user.roles[0] == 'ROLE_USER' %}
+                <a
+                    href="mailto:alice.webdeveloppement@gmail.com?subject=Question de {{ app.user }}"
+                    class="btn btn-alice mx-2"
+                >
+                    Écrire à Antoine
+                </a>
+            {% endif %}
+        </div>
     </div>
-
-</div>
-
-
-
-
-
 {% endblock %}
-

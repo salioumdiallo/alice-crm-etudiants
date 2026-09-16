@@ -3,55 +3,101 @@
 {% block title %}Zone Tarifaire | Alice CRM{% endblock %}
 
 {% block body %}
-    
-
     <div class="d-flex align-items-center justify-content-between mb-3">
         <h1>Détail Zone Tarifaire : {{ tariff_zone.name }}</h1>
-                <div class="button-go-back" alt="Retour page précédente" onclick="window.history.back();">
-            <i class="fa-sharp fa-solid fa-circle-chevron-left fa-2xl"></i>
+
+        <div
+            class="button-go-back"
+            role="button"
+            tabindex="0"
+            aria-label="Retour à la page précédente"
+            onclick="window.history.back();"
+        >
+            <i
+                class="fa-sharp fa-solid fa-circle-chevron-left fa-2xl"
+                aria-hidden="true"
+            ></i>
         </div>
     </div>
-        <div class="d-flex flex-column align-items-center flex-sm-row flex-sm-wrap mb-3 me-md-1 justify-content-center justify-content-lg-end">
-            <a href="{{ path('app_tariff_zone_edit', {'id': tariff_zone.id}) }}" class="btn btn-alice mx-2">Modifier</a>
-            {% if customers is empty %}
-                {{ include('tariff_zone/_delete_form.html.twig') }}
+
+    <div class="d-flex flex-column align-items-center flex-sm-row flex-sm-wrap mb-3 me-md-1 justify-content-center justify-content-lg-end">
+        <a
+            href="{{ path('app_tariff_zone_edit', {'id': tariff_zone.id}) }}"
+            class="btn btn-alice mx-2"
+        >
+            Modifier
+        </a>
+
+        {% if customers is empty %}
+            {{ include('tariff_zone/_delete_form.html.twig') }}
         {% else %}
-        <span class="d-inline-block" data-bs-toggle="tooltip" data-bs-title="Suppression impossible de la zone tarifaire : {{ tariff_zone.name|upper }}. Veuillez retirer tous les clients attachés à cette zone afin de la supprimer.">
-            <button class="btn btn-danger" type="button" disabled>Supprimer</button>
-        </span>
+            <span
+                class="d-inline-block"
+                data-bs-toggle="tooltip"
+                data-bs-title="Suppression impossible de la zone tarifaire : {{ tariff_zone.name|upper }}. Veuillez retirer tous les clients attachés à cette zone afin de la supprimer."
+            >
+                <button
+                    class="btn btn-danger"
+                    type="button"
+                    disabled
+                >
+                    Supprimer
+                </button>
+            </span>
         {% endif %}
     </div>
 
     <table class="table mt-5">
+        <caption class="visually-hidden">
+            Informations de la zone tarifaire {{ tariff_zone.name }}
+        </caption>
+
         <tbody>
             <tr>
-                <th>Nom</th>
+                <th scope="row">Nom</th>
                 <td>{{ tariff_zone.name }}</td>
             </tr>
+
             <tr>
-                <th>Tarif</th>
+                <th scope="row">Tarif</th>
                 <td>{{ tariff_zone.amount }} €</td>
             </tr>
         </tbody>
     </table>
 
-    <h1 class="mt-5">Liste des clients rattachés</h1>
-        {% if customers is empty %}
+    <h2 class="mt-5">Liste des clients rattachés</h2>
+
+    {% if customers is empty %}
         <p>Aucun client</p>
-        {% else %}
-            <table class="table mt-5">
-                <tbody>
+    {% else %}
+        <table class="table mt-5">
+            <caption class="visually-hidden">
+                Clients rattachés à la zone tarifaire {{ tariff_zone.name }}
+            </caption>
+
+            <thead>
+                <tr>
+                    <th scope="col">Nom</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for customer in customers %}
                     <tr>
-                        <th>Nom</th>
+                        <td>
+                            <a
+                                href="{{ path('app_customer', {
+                                    'id': customer.id,
+                                    'slug': customer.slug
+                                }) }}"
+                                class="hover-link"
+                            >
+                                {{ customer.name }}
+                            </a>
+                        </td>
                     </tr>
-                    {% for customer in customers %}
-                    <tr>
-                        <td><a href="{{ path('app_customer', { 'id': customer.id, 'slug': customer.slug }) }}" class="hover-link">{{ customer.name }}</a></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                {% endfor %}
+            </tbody>
+        </table>
     {% endif %}
-
-
 {% endblock %}

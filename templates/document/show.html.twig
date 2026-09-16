@@ -8,7 +8,9 @@
 
         <div
             class="button-go-back"
-            alt="Retour page précédente"
+            role="button"
+            tabindex="0"
+            aria-label="Retour à la liste des documents"
             onclick="window.location.href='{{ path('app_document_list') }}';"
         >
             <i class="fa-sharp fa-solid fa-circle-chevron-left fa-2xl"></i>
@@ -17,11 +19,15 @@
 
     <div class="table-responsive">
         <table class="table">
+            <caption class="visually-hidden">
+                Détails du document {{ document.name }}
+            </caption>
+
             <thead>
                 <tr>
-                    <th>Nom</th>
+                    <th scope="col">Nom</th>
 
-                    <th>
+                    <th scope="col">
                         <div class="d-flex justify-content-between align-items-center">
                             Description
 
@@ -30,21 +36,27 @@
                                     class="d-inline-block span-info-document-description btn-fa-action-eye"
                                     data-bs-toggle="tooltip"
                                     data-bs-title="Description complète : Afficher / Cacher"
+                                    role="button"
+                                    tabindex="0"
+                                    aria-label="Afficher ou cacher la description complète"
                                 >
-                                    <i class="fa-solid fa-eye fa-xl button-eye-document-description"></i>
+                                    <i
+                                        class="fa-solid fa-eye fa-xl button-eye-document-description"
+                                        aria-hidden="true"
+                                    ></i>
                                 </span>
                             {% endif %}
                         </div>
                     </th>
 
-                    <th>Date</th>
-                    <th>Famille</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Famille</th>
 
                     {% if isAuthorized %}
-                        <th>Utilisateurs autorisés</th>
+                        <th scope="col">Utilisateurs autorisés</th>
                     {% endif %}
 
-                    <th>Actions</th>
+                    <th scope="col">Actions</th>
                 </tr>
             </thead>
 
@@ -114,8 +126,12 @@
                                 <a
                                     href="{{ path('app_document_edit', {'id': document.id}) }}"
                                     class="btn-fa-action-list mx-1"
+                                    aria-label="Modifier le document {{ document.name }}"
                                 >
-                                    <i class="fa-solid fa-pen-to-square fa-xl"></i>
+                                    <i
+                                        class="fa-solid fa-pen-to-square fa-xl"
+                                        aria-hidden="true"
+                                    ></i>
                                 </a>
                             {% endif %}
 
@@ -123,8 +139,12 @@
                                 href="{{ path('app_document_file', {'id': document.id}) }}"
                                 download
                                 class="btn-fa-action-list mx-1"
+                                aria-label="Télécharger le document {{ document.name }}"
                             >
-                                <i class="fa-solid fa-download fa-xl"></i>
+                                <i
+                                    class="fa-solid fa-download fa-xl"
+                                    aria-hidden="true"
+                                ></i>
                             </a>
 
                             {% if isAuthorized %}
@@ -142,7 +162,7 @@
             <embed
                 src="{{ path('app_document_file', {'id': document.id}) }}"
                 type="application/pdf"
-                alt="{{ document.name }}"
+                title="{{ document.name }}"
                 width="300"
                 height="1000"
             >

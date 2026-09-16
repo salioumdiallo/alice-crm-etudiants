@@ -5,55 +5,77 @@
 {% block body %}
     <div class="d-flex align-items-center justify-content-between mb-3">
         <h1>Liste des contacts</h1>
-        <div class="button-go-back" alt="Retour page précédente" onclick="window.history.back();">
+
+        <div
+            class="button-go-back"
+            role="button"
+            tabindex="0"
+            aria-label="Retour à la page précédente"
+            onclick="window.history.back();"
+        >
             <i class="fa-sharp fa-solid fa-circle-chevron-left fa-2xl"></i>
         </div>
     </div>
 
-<div class="table-responsive">
+    <div class="table-responsive">
+        <table class="table">
+            <caption>Liste des contacts clients</caption>
 
-    <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Nom du client</th>
+                    <th scope="col">Nom</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Téléphone</th>
+                    <th scope="col">Fonction</th>
+                    <th scope="col">Contact principal</th>
+                </tr>
+            </thead>
 
-        <thead>
-            <tr>
-                <th scope="col">Nom du client</th>
-                <th scope="col">Nom</th>
-                <th scope="col">Email</th>
-                <th scope="col">Téléphone</th>
-                <th scope="col">Fonction</th>
-                <th scope="col">Contact Principal</th>
-            </tr>
-        </thead>
+            <tbody>
+                {% for contact in contacts %}
+                    <tr>
+                        <td>
+                            {% if contact.user.customer %}
+                                {{ contact.user.customer.name }}
+                            {% endif %}
+                        </td>
 
-    {% for contact in contacts %}
+                        <td>
+                            <a
+                                href="{{ path('app_contact', {'id': contact.id, 'slug': contact.slug}) }}"
+                                class="hover-link"
+                            >
+                                {{ contact.lastname }} {{ contact.firstname }}
+                            </a>
+                        </td>
 
-        <tbody>
-            <tr>
-                <td>{% if contact.user.customer %}  {{ contact.user.customer.name }} {% endif %}</td>
-                <td><a href="{{ path('app_contact', { 'id': contact.id, 'slug': contact.slug}) }}" class="hover-link">{{ contact.lastname }} {{ contact.firstname }}</a></td>
-                <td>{{ contact.email }}</td>
-                <td>{{ contact.phone|phone_number_format('INTERNATIONAL') }}</td>                
-                <td>{{ contact.position }}</td>
+                        <td>{{ contact.email }}</td>
 
-                {% if contact.isMain == 1 %}
-                <td class="text-start m-0"><i class="fa-sharp fa-solid fa-circle-check fa-xl" style="color: #19374d;"></i></td>
+                        <td>
+                            {{ contact.phone|phone_number_format('INTERNATIONAL') }}
+                        </td>
+
+                        <td>{{ contact.position }}</td>
+
+                        <td class="text-start m-0">
+                            {% if contact.isMain == 1 %}
+                                <i
+                                    class="fa-sharp fa-solid fa-circle-check fa-xl"
+                                    style="color: #19374d;"
+                                    aria-label="Contact principal"
+                                ></i>
+                            {% endif %}
+                        </td>
+                    </tr>
                 {% else %}
-                {% endif %}
-
-            </tr>
-
-        </tbody>
-
-    {% endfor %}
-
-    </table>
-    
-</div>
-
-
-
-
-
-
-
+                    <tr>
+                        <td colspan="6" class="text-center">
+                            Aucun contact disponible.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
